@@ -1,4 +1,4 @@
-# # Makefile for Windows
+# Makefile for Windows
 # SRCDIR=./source
 # CC=gcc
 # INCLUDE = C:\msys64\mingw64\include\SDL2
@@ -12,52 +12,51 @@
 # main.o: $(SRCDIR)/main.c
 # 	$(CC) $(CFLAGS) $(SRCDIR)/main.c
 
-# simpleSDLexample2: model.o
-# 	$(CC) model.o -o simpleSDLexample2 $(LDFLAGS)
-
-# model.o: $(SRCDIR)/model.c
-# 	$(CC) $(CFLAGS) $(SRCDIR)/model.c
-
 # clean:
 # 	rm *.exe
 # 	rm *.o
 
-
 # Makefile for Windows
 SRCDIR=./source
 CC=gcc
-INCLUDE = C:\msys64\mingw64\include\SDL2
+INCLUDE=C:\msys64\mingw64\include\SDL2
 
-CFLAGS = -g -I$(INCLUDE) -I./model -c
-LDFLAGS = -lmingw32 -lSDL2main -lSDL2_image -lSDL2 -mwindows -lm
+CFLAGS=-g -I$(INCLUDE) -I$(SRCDIR)/model -I$(SRCDIR)/view -I$(SRCDIR)/controller
+LDFLAGS=-lmingw32 -lSDL2main -lSDL2_image -lSDL2 -mwindows -lm
 
-# Target executable
-simpleSDLexample1: main.o model.o view.o controller.o
-	$(CC) main.o model.o view.o controller.o -o simpleSDLexample1 $(LDFLAGS)
+# Define paths to object files based on the source files
+MAIN_O=$(SRCDIR)/main.o
+MODEL_O=$(SRCDIR)/model/GameModel.o
+VIEW_O=$(SRCDIR)/view/GameView.o
+CONTROLLER_O=$(SRCDIR)/controller/GameController.o
 
-# Compile main.c into main.o
-main.o: $(SRCDIR)/main.c
-	$(CC) $(CFLAGS) -o main.o $(SRCDIR)/main.c
+# Define the final executable file
+EXECUTABLE=simpleSDLexample1
 
-# Compile model.c into model.o
-model.o: model/model.c
-	$(CC) $(CFLAGS) -o model.o model/model.c
+# Default rule
+all: $(EXECUTABLE)
 
-# Compile view.c into view.o
-view.o: view/view.c
-	$(CC) $(CFLAGS) -o view.o view/view.c
+# Linking all the object files to the executable
+$(EXECUTABLE): $(MAIN_O) $(MODEL_O) $(VIEW_O) $(CONTROLLER_O)
+	$(CC) $^ -o $@ $(LDFLAGS)
 
-# Compile controller.c into controller.o
-controller.o: controller/controller.c
-	$(CC) $(CFLAGS) -o controller.o controller/controller.c
+# Compiling the main file into its object file
+$(MAIN_O): $(SRCDIR)/main.c
+	$(CC) $(CFLAGS) $< -o $@
 
-	
-# Compile controller.c into controller.o
-define.o: source/define.h
-	$(CC) $(CFLAGS) -o define.o source/define.h
+# Compiling the model file into its object file
+$(MODEL_O): $(SRCDIR)/model/GameModel.c $(SRCDIR)/model/GameModel.h
+	$(CC) $(CFLAGS) $< -o $@
 
-# Alla andra filer
+# Compiling the view file into its object file
+$(VIEW_O): $(SRCDIR)/view/GameView.c $(SRCDIR)/view/GameView.h
+	$(CC) $(CFLAGS) $< -o $@
+
+# Compiling the controller file into its object file
+$(CONTROLLER_O): $(SRCDIR)/controller/GameController.c $(SRCDIR)/controller/GameController.h
+	$(CC) $(CFLAGS) $< -o $@
 
 # Clean up command
 clean:
-	rm -f *.exe *.o
+	del /Q $(MAIN_O) $(MODEL_O) $(VIEW_O) $(CONTROLLER_O) $(EXECUTABLE).exe
+
