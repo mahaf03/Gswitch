@@ -76,7 +76,7 @@
 
 
 # Makefile for Windows
-SRCDIR=.
+SRCDIR=./source
 CC=gcc
 INCLUDE=C:\msys64\mingw64\include\SDL2
 
