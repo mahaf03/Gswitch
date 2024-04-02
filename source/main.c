@@ -1,5 +1,4 @@
 
-// main.c
 #include <SDL2/SDL.h>
 #include "GameModel.h"
 #include "GameView.h"
@@ -10,11 +9,14 @@ int main(int argv, char** args) {
 
     SDL_Window* window = NULL;
     SDL_Renderer* renderer = NULL;
-    SDL_Texture* texture = NULL;
+    SDL_Texture* texture = NULL;    // Skeppets textur
+    SDL_Texture* bgTexture = NULL;  // Bakgrundstextur
 
     GameModel model;
     initializeModel(&model);
-    initView(&renderer, &window, &texture);
+    
+    // Du måste också passera en pekare till bakgrundstexturen till initView
+    initView(&renderer, &window, &texture, &bgTexture);
 
     bool closeWindow = false;
     while (!closeWindow) {
@@ -24,12 +26,15 @@ int main(int argv, char** args) {
         }
 
         updateModel(&model);
-        renderView(renderer, texture, &model);
+        
+        // Uppdatera renderView-anropet för att inkludera bakgrundstexturen
+        renderView(renderer, texture, bgTexture, &model);
+        
         SDL_Delay(1000 / 60); // Approximate 60 FPS
     }
 
-
-    closeView(renderer, window, texture);
+    // Glöm inte att skicka bgTexture till closeView så att det också kan rensas upp
+    closeView(renderer, window, texture, bgTexture);
     SDL_Quit();
     return 0;
 }
