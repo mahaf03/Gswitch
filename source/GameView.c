@@ -5,7 +5,7 @@
 void initView(SDL_Renderer** renderer, SDL_Window** window, SDL_Texture** texture) {
     *window = SDL_CreateWindow("Enkelt exempel 1", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 600, 400, 0);
     *renderer = SDL_CreateRenderer(*window, -1, SDL_RENDERER_ACCELERATED);
-    SDL_Surface* surface = IMG_Load("resources/ship.png");
+    SDL_Surface* surface = IMG_Load("resources/austrounat.png");
     *texture = SDL_CreateTextureFromSurface(*renderer, surface);
     SDL_FreeSurface(surface);
 }
