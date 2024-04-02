@@ -30,9 +30,7 @@
 void initView(SDL_Renderer** renderer, SDL_Window** window, SDL_Texture** texture, SDL_Texture** backgroundTexture) {
     *window = SDL_CreateWindow("GSwitch", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1000, 800, 0);
     *renderer = SDL_CreateRenderer(*window, -1, SDL_RENDERER_ACCELERATED);
-
-    // Ladda skeppstexturen
-    SDL_Surface* surface = IMG_Load("resources/ship.png");
+    SDL_Surface* surface = IMG_Load("resources/austrounat.png");
     *texture = SDL_CreateTextureFromSurface(*renderer, surface);
     SDL_FreeSurface(surface);
 
