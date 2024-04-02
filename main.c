@@ -1,3 +1,4 @@
+
 // main.c
 #include <SDL2/SDL.h>
 #include "GameModel.h"
