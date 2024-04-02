@@ -63,6 +63,6 @@ void updateModel(GameModel* model) {
     // Keep the ship within window bounds
     if (model->x < 0) model->x = 0;
     if (model->y < 0) model->y = 0;
-    if (model->x > 600 - 50) model->x = 600 - 50; // Window width - ship width
-    if (model->y > 400 - 50) model->y = 400 - 50; // Window height - ship height
+    if (model->x > 1000 - 50) model->x = 1000 - 50; // Window width - ship width
+    if (model->y > 800 - 50) model->y = 800 - 50; // Window height - ship height
 }
