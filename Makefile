@@ -16,92 +16,53 @@
 # 	rm *.exe
 # 	rm *.o
 
-#makefile for windows
-
-# SRCDIR=./source
-# CC=gcc
-# INCLUDE=C:\msys64\mingw64\include\SDL2
-
-# CFLAGS = -g -I$(INCLUDE) -c
-# LDFLAGS = -lmingw32 -lSDL2main -lSDL2_image -lSDL2 -mwindows -lm
-
-# GSwitch: main.o model.o view.o controller.o 
-
-
-
-# #Makefile for Windows
-# SRCDIR=./source
-# CC=gcc
-# INCLUDE=C:\msys64\mingw64\include\SDL2
-
-# CFLAGS=-g -I$(INCLUDE) -I$(SRCDIR)/model -I$(SRCDIR)/view -I$(SRCDIR)/controller
-# LDFLAGS=-lmingw32 -lSDL2main -lSDL2_image -lSDL2 -mwindows -lm
-
-# # Define paths to object files based on the source files
-# MAIN_O=$(SRCDIR)/main.o
-# MODEL_O=$(SRCDIR)/model/GameModel.o
-# VIEW_O=$(SRCDIR)/view/GameView.o
-# CONTROLLER_O=$(SRCDIR)/controller/GameController.o
-
-# # Define the final executable file
-# EXECUTABLE=GSwitch
-
-# # Default rule
-# all: $(EXECUTABLE)
-
-# # Linking all the object files to the executable
-# $(EXECUTABLE): $(MAIN_O) $(MODEL_O) $(VIEW_O) $(CONTROLLER_O)
-# 	@echo Linking: $(CC) $^ -o $@ $(LDFLAGS)
-# 	$(CC) $^ -o $@ $(LDFLAGS)
-
-# # Compiling the main file into its object file
-# $(MAIN_O): $(SRCDIR)/main.c
-# 	$(CC) $(CFLAGS) $< -o $@
-
-# # Rules for compiling the .c files into .o files
-# $(MODEL_O): $(SRCDIR)/model/GameModel.c $(SRCDIR)/model/GameModel.h
-# 	$(CC) $(CFLAGS) -c $< -o $@
-
-# $(VIEW_O): $(SRCDIR)/view/GameView.c $(SRCDIR)/view/GameView.h
-# 	$(CC) $(CFLAGS) -c $< -o $@
-
-# $(CONTROLLER_O): $(SRCDIR)/controller/GameController.c $(SRCDIR)/controller/GameController.h
-# 	$(CC) $(CFLAGS) -c $< -o $@
-
-# # Clean up command
-# clean:
-# 	del /Q $(MAIN_O) $(MODEL_O) $(VIEW_O) $(CONTROLLER_O) $(EXECUTABLE).exe
-
-
-
-
 # Makefile for Windows
+#vpath %.c ./source
+#vpath %.h ./source
+
+vpath %.h ./source
+vpath %.c ./source
 SRCDIR=./source
 CC=gcc
 INCLUDE=C:\msys64\mingw64\include\SDL2
 
-CFLAGS=-g -I$(INCLUDE)
-LDFLAGS=-lmingw32 -lSDL2main -lSDL2_image -lSDL2 -mwindows -lm
+CFLAGS=-g -I$(INCLUDE) -c -Wall -O
 
-# Define object files
-OBJS=$(SRCDIR)/main.o $(SRCDIR)/GameModel.o $(SRCDIR)/GameView.o $(SRCDIR)/GameController.o
+LDFLAGS = -lSDL2main -lSDL2_image -lSDL2 -lm -lSDL2_net
+#LDFLAGS=-lmingw32 -lSDL2main -lSDL2_image -lSDL2 -mwindows -lm
+
+# Define paths to object files based on the source files
 
 # Define the final executable file
-EXECUTABLE=GSwitch
+EXECUTABLE=simpleSDLexample1
 
 # Default rule
 all: $(EXECUTABLE)
 
 # Linking all the object files to the executable
-$(EXECUTABLE): $(OBJS)
-	@echo Linking: $(CC) $^ -o $@ $(LDFLAGS)
-	$(CC) $^ -o $@ $(LDFLAGS)
 
-# Pattern rule for compiling the .c files into .o files
-$(SRCDIR)/%.o: $(SRCDIR)/%.c
-	$(CC) $(CFLAGS) -c $< -o $@
+$(EXECUTABLE): $(SRCDIR)/main.o $(SRCDIR)/GameModel.o $(SRCDIR)/GameView.o $(SRCDIR)/GameController.o
+	$(CC) $(SRCDIR)/main.o $(SRCDIR)/GameModel.o  $(SRCDIR)/GameView.o $ $(SRCDIR)/GameController.o -o $(EXECUTABLE) $(LDFLAGS)
+
+# Compiling the main file into its object file
+$(SRCDIR)/main.o: main.c $(SRCDIR)/GameModel.h GameView.h GameController.h
+	$(CC) $(CFLAGS) $(SRCDIR)/main.c -o $(SRCDIR)/main.o $(LDFLAGS)
+
+# Compiling the model file into its object file
+$(SRCDIR)/GameModel.o: GameModel.c GameModel.h GameView.h GameController.h
+	$(CC) $(CFLAGS) $(SRCDIR)/GameModel.c -o $(SRCDIR)/GameModel.o $(LDFLAGS)
+
+# Compiling the view file into its object file
+$(SRCDIR)/GameView.o: GameView.c GameView.h GameController.h
+	$(CC) $(CFLAGS) $(SRCDIR)/GameView.c -o $(SRCDIR)/GameView.o $(LDFLAGS)
+
+# Compiling the controller file into its object file
+$(SRCDIR)/GameController.o: GameController.c GameController.h
+	$(CC) $(CFLAGS) $(SRCDIR)/GameController.c -o $(SRCDIR)/GameController.o $(LDFLAGS)
 
 # Clean up command
 clean:
-	rm *.exe
-	rm *.o
+	@echo "cleaning..."
+	rm -rf $(SRCDIR)/*.o
+	rm -f $(EXECUTABLE)
+	@echo "Success"
