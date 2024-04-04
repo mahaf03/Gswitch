@@ -50,7 +50,7 @@ void handleEvent(SDL_Event* event, GameModel* model, bool* closeWindow) {
 }
 
 void updateModel(GameModel* model) {
-    const float speed = 1.5f;
+    const float speed = 4.5f;
     model->velocityX = model->velocityY = 0;
     if (model->up && !model->down) model->velocityY = -speed;
     if (model->down && !model->up) model->velocityY = speed;

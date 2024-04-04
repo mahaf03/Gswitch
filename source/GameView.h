@@ -13,4 +13,6 @@ void renderView(SDL_Renderer* renderer, SDL_Texture* shipTexture, SDL_Texture* b
 void closeView(SDL_Renderer* renderer, SDL_Window* window, SDL_Texture* shipTexture, SDL_Texture* backgroundTexture, SDL_Texture* blockTexture);
 void loadBackground(SDL_Renderer* renderer, SDL_Texture** backgroundTexture);
 void loadBlock(SDL_Renderer* renderer, SDL_Texture** blockTexture);
+void placeTile(SDL_Renderer* renderer, SDL_Texture* texture, int x, int y);
+
 #endif
