@@ -22,7 +22,10 @@ void handleEvent(SDL_Event* event, GameModel* model, bool* closeWindow) {
                     break;
                 case SDL_SCANCODE_D:
                 case SDL_SCANCODE_RIGHT:
-                    model->right = true;
+                    if(!model->collisionRight){
+                        model->right = true;
+                        break;
+                    }
                     break;
             }
             break;
@@ -65,4 +68,14 @@ void updateModel(GameModel* model) {
     if (model->y < 0) model->y = 0;
     if (model->x > 1000 - 50) model->x = 1000 - 50; // Window width - ship width
     if (model->y > 800 - 50) model->y = 800 - 50; // Window height - ship height
+}
+
+void stopModel(GameModel* model, int direction) {
+    if(direction == 1){
+        model->velocityX = 0;
+        model->left = model->right = false;
+        model->collisionRight = true;
+    }
+    
+
 }

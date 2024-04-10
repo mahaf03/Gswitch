@@ -7,5 +7,6 @@
 
 void handleEvent(SDL_Event* event, GameModel* model, bool* closeWindow);
 void updateModel(GameModel* model);
+void stopModel(GameModel* model, int collision);
 
 #endif

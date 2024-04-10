@@ -32,7 +32,7 @@ int main(int argv, char** args) {
         renderView(renderer, texture, bgTexture, blockTexture, &model);
 
         
-        SDL_Delay(1000 / 60); // Approximate 60 FPS
+        // SDL_Delay(1000 / 60); // Approximate 60 FPS
     }
 
     // Glöm inte att skicka bgTexture till closeView så att det också kan rensas upp

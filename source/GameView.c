@@ -2,7 +2,7 @@
 #include "GameView.h"
 #include <SDL2/SDL_image.h>
 #include <stdbool.h>
-
+#include "GameController.h"
 
 void initView(SDL_Renderer** renderer, SDL_Window** window, SDL_Texture** texture, SDL_Texture** backgroundTexture ,SDL_Texture** blockTexture) {
     *window = SDL_CreateWindow("GSwitch", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1000, 800, 0);
@@ -38,21 +38,29 @@ void loadBlock(SDL_Renderer* renderer, SDL_Texture** blockTexture) {
     SDL_FreeSurface(surface);
 }
 
-bool checkCollision(SDL_Rect a, SDL_Rect b) {
-    return (a.x + a.w > b.x) && (a.x < b.x + b.w) && (a.y + a.h > b.y) && (a.y < b.y + b.h);
+int checkCollision(SDL_Rect shipRect, SDL_Rect blockRect) {
+    if(shipRect.x + shipRect.w > blockRect.x) return 1;
+    else if(shipRect.x < blockRect.x + blockRect.w) return 2;
+    else if(shipRect.y + shipRect.h > blockRect.y) return 3;
+    else if(shipRect.y < blockRect.y + blockRect.h) return 4;
+    else return 0;
 }
 
 void renderView(SDL_Renderer* renderer, SDL_Texture* shipTexture, SDL_Texture* backgroundTexture, SDL_Texture* blockTexture, GameModel* model) {
     SDL_RenderClear(renderer);
 
     // Antag att dessa är dina blockpositioner
-    SDL_Rect blockPositions[] = {
-        {0, 0, 50, 50}, {50, 0, 50, 50}, // Övre vänstra hörnet
-        {0, 750, 50, 50}, {50, 750, 50, 50}, {100, 750, 50, 50}, // Nedre vänstra hörnet
-        {150, 750, 50, 50}, {200, 750, 50, 50}, {250, 750, 50, 50}, // Fler positioner...
-        {500, 750, 50, 50}, {550, 750, 50, 50}, {600, 750, 50, 50},
-        {650, 750, 50, 50}, {700, 750, 50, 50},
-        {600, 400, 50, 50}, {650, 400, 50, 50}, {700, 400, 50, 50}, {750, 400, 50, 50}
+    // SDL_Rect blockPositions[] = {
+    //     {0, 0, 50, 50}, {50, 0, 50, 50}, // Övre vänstra hörnet
+    //     {0, 750, 50, 50}, {50, 750, 50, 50}, {100, 750, 50, 50}, // Nedre vänstra hörnet
+    //     {150, 750, 50, 50}, {200, 750, 50, 50}, {250, 750, 50, 50}, // Fler positioner...
+    //     {500, 750, 50, 50}, {550, 750, 50, 50}, {600, 750, 50, 50},
+    //     {650, 750, 50, 50}, {700, 750, 50, 50},
+    //     {600, 400, 50, 50}, {650, 400, 50, 50}, {700, 400, 50, 50}, {750, 400, 50, 50}
+    // };
+        SDL_Rect blockPositions[] = {
+        
+        {600, 400, 50, 50}
     };
     int numBlocks = sizeof(blockPositions) / sizeof(blockPositions[0]);
 
@@ -65,24 +73,37 @@ void renderView(SDL_Renderer* renderer, SDL_Texture* shipTexture, SDL_Texture* b
     SDL_Rect shipRect = { (int)model->x, (int)model->y, 50, 50 };
     SDL_RenderCopy(renderer, shipTexture, NULL, &shipRect);
 
-    bool collisionDetected = false;
 
     // Rendera blocken från listan
     for (int i = 0; i < numBlocks; i++) {
         placeTile(renderer, blockTexture, blockPositions[i].x, blockPositions[i].y);
 
-        if (checkCollision(shipRect, blockPositions[i])) {
-            collisionDetected = true;
-            // Hantera kollision här (exempelvis avsluta spelet, minska liv, etc.)
-            break; // Bryt loopen om du inte vill processa fler kollisioner
+        if (checkCollision(shipRect, blockPositions[i]) == 1) {
+             printf("Krock till höger\n");
+             stopModel(model, 1); // Stoppa modellen (eller gör något annat beroende på vad du vill göra
+
+         }
+        // else if (checkCollision(shipRect, blockPositions[i]) == 2) {
+        //     printf("Krock från höger\n");
+        //     stopModel(model); // Stoppa modellen (eller gör något annat beroende på vad du vill göra
+        // }
+        // else if (checkCollision(shipRect, blockPositions[i]) == 3) {
+        //     printf("Krock uppifrån\n");
+        //     stopModel(model); // Stoppa modellen (eller gör något annat beroende på vad du vill göra
+        // }
+        // else if (checkCollision(shipRect, blockPositions[i]) == 4) {
+        //     printf("Krock underifrån\n");
+        //     stopModel(model); // Stoppa modellen (eller gör något annat beroende på vad du vill göra
+        // }
+
+        else (checkCollision(shipRect, blockPositions[i]) == 0); { // TODO fixa collisionsflaggorna till false
+            model->collisionRight = false;
+            printf("Ingen krock\n");
         }
     }
 
     SDL_RenderPresent(renderer);
-    if (collisionDetected) {
-        printf("Kollision upptäckt! Vidtag lämpliga åtgärder.\n");
-        // Exempel: Stoppa spelet eller återställ skeppets position etc.
-    }
+
 
 }
 
