@@ -39,7 +39,20 @@ void loadBlock(SDL_Renderer* renderer, SDL_Texture** blockTexture) {
 }
 
 int checkCollision(SDL_Rect shipRect, SDL_Rect blockRect) {
-    if(shipRect.x + shipRect.w > blockRect.x) return 1;
+    if(shipRect.x + shipRect.w > blockRect.x){//krock från höger
+        printf("Krock från högerish\n");
+        if(shipRect.y < blockRect.y + blockRect.h){
+            printf("Krock underifrån\n");
+            return 1;
+        } // Kollision uppifrån
+        
+        else if(shipRect.y + shipRect.h > blockRect.y){
+            printf("Krock uppifrån\n");
+            return 2;
+        } // Kollision underifrån
+        
+    }
+    if((shipRect.x + shipRect.w > blockRect.x && shipRect.y + shipRect.h > blockRect.y) ||(shipRect.x + shipRect.w > blockRect.x && shipRect.y < blockRect.y + blockRect.h)) return 1; //kollision höger
     else if(shipRect.x < blockRect.x + blockRect.w) return 2;
     else if(shipRect.y + shipRect.h > blockRect.y) return 3;
     else if(shipRect.y < blockRect.y + blockRect.h) return 4;

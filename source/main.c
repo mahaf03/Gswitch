@@ -19,8 +19,16 @@ int main(int argv, char** args) {
     // Du måste också passera en pekare till bakgrundstexturen till initView
     initView(&renderer, &window, &texture, &bgTexture, &blockTexture);
 
+    const int FPS = 60;
+    const int frameDelay = 1000 / FPS; // Tiden varje frame bör ta
+
+    Uint32 frameStart;
+    int frameTime;
+
+
     bool closeWindow = false;
     while (!closeWindow) {
+        frameStart = SDL_GetTicks(); // Tidpunkten då ramen startar
         SDL_Event event;
         while (SDL_PollEvent(&event)) {
             handleEvent(&event, &model, &closeWindow);
@@ -31,6 +39,11 @@ int main(int argv, char** args) {
         // Uppdatera renderView-anropet för att inkludera bakgrundstexturen
         renderView(renderer, texture, bgTexture, blockTexture, &model);
 
+        frameTime = SDL_GetTicks() - frameStart; // Hur länge det tog att processa ramen
+
+        if (frameDelay > frameTime) {
+            SDL_Delay(frameDelay - frameTime);
+        }
         
         // SDL_Delay(1000 / 60); // Approximate 60 FPS
     }
