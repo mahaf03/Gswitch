@@ -1,4 +1,4 @@
-
+//main.c
 #include <SDL2/SDL.h>
 #include "GameModel.h"
 #include "GameView.h"
@@ -27,7 +27,7 @@ int main(int argv, char** args) {
 
 
     bool closeWindow = false;
-    while (!closeWindow) {
+    while (!closeWindow) {          // Game Loop
         frameStart = SDL_GetTicks(); // Tidpunkten då ramen startar
         SDL_Event event;
         while (SDL_PollEvent(&event)) {

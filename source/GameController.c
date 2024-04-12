@@ -52,26 +52,29 @@ void handleEvent(SDL_Event* event, GameModel* model, bool* closeWindow) {
     }
 }
 
+
 void updateModel(GameModel* model) {
     const float speed = 4.5f;
     model->velocityX = model->velocityY = 0;
+
     if (model->up && !model->down) model->velocityY = -speed;
     if (model->down && !model->up) model->velocityY = speed;
+
     if (model->left && !model->right) model->velocityX = -speed;
-    if (model->right && !model->left) model->velocityX = speed;
+    if (model->right && !model->left && !model->collisionRight) model->velocityX = speed; // Prevent right movement if collision on the right
 
     model->x += model->velocityX;
     model->y += model->velocityY;
-    
-    // Keep the ship within window bounds
-    if (model->x < 0) model->x = 0;
-    if (model->y < 0) model->y = 0;
-    if (model->x > 1000 - 50) model->x = 1000 - 50; // Window width - ship width
-    if (model->y > 800 - 50) model->y = 800 - 50; // Window height - ship height
+
 }
 
 void stopModel(GameModel* model, int direction) {
     if(direction == 1){
+        model->velocityX = 0;
+        model->left = model->right = false;
+        model->collisionRight = true;
+    }
+    if(direction == 2){
         model->velocityX = 0;
         model->left = model->right = false;
         model->collisionRight = true;

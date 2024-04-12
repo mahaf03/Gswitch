@@ -38,26 +38,91 @@ void loadBlock(SDL_Renderer* renderer, SDL_Texture** blockTexture) {
     SDL_FreeSurface(surface);
 }
 
+// int checkCollision(SDL_Rect shipRect, SDL_Rect blockRect) {
+    
+//     if((shipRect.x + shipRect.w > blockRect.x && shipRect.y + shipRect.h > blockRect.y) ||(shipRect.x + shipRect.w > blockRect.x && shipRect.y < blockRect.y + blockRect.h)){
+//         printf("1\n");
+//         return 1; //kollision höger
+//     } 
+//     else if(shipRect.x < blockRect.x + blockRect.w){
+//         printf("2\n");
+//         return 2; //kollision vänster
+//     }
+//     else if(shipRect.y + shipRect.h > blockRect.y){
+//         printf("3\n");
+//         return 3; //kollision uppifrån
+//     }
+//     else if(shipRect.y < blockRect.y + blockRect.h){
+//         printf("4\n");
+//         return 4; //kollision underifrån
+//     }
+//     else{
+//         printf("0\n");
+//         return 0;
+//     }
+// }
 int checkCollision(SDL_Rect shipRect, SDL_Rect blockRect) {
-    if(shipRect.x + shipRect.w > blockRect.x){//krock från höger
-        printf("Krock från högerish\n");
-        if(shipRect.y < blockRect.y + blockRect.h){
-            printf("Krock underifrån\n");
-            return 1;
-        } // Kollision uppifrån
-        
-        else if(shipRect.y + shipRect.h > blockRect.y){
-            printf("Krock uppifrån\n");
-            return 2;
-        } // Kollision underifrån
-        
+    // Check for no collision first
+    if (shipRect.x + shipRect.w <= blockRect.x ||  // ship is to the left of block
+        shipRect.x >= blockRect.x + blockRect.w || // ship is to the right of block
+        shipRect.y + shipRect.h <= blockRect.y ||  // ship is above block
+        shipRect.y >= blockRect.y + blockRect.h) { // ship is below block
+        return 0; // No collision
     }
-    if((shipRect.x + shipRect.w > blockRect.x && shipRect.y + shipRect.h > blockRect.y) ||(shipRect.x + shipRect.w > blockRect.x && shipRect.y < blockRect.y + blockRect.h)) return 1; //kollision höger
-    else if(shipRect.x < blockRect.x + blockRect.w) return 2;
-    else if(shipRect.y + shipRect.h > blockRect.y) return 3;
-    else if(shipRect.y < blockRect.y + blockRect.h) return 4;
-    else return 0;
+
+    // Determine the side of the collision
+    int shipRight = shipRect.x + shipRect.w;
+    int shipBottom = shipRect.y + shipRect.h;
+    int blockRight = blockRect.x + blockRect.w;
+    int blockBottom = blockRect.y + blockRect.h;
+
+    // Horizontal collision detection
+    int shipMidX = shipRect.x + shipRect.w / 2;
+    int blockMidX = blockRect.x + blockRect.w / 2;
+    int shipMidY = shipRect.y + shipRect.h / 2;
+    int blockMidY = blockRect.y + blockRect.h / 2;
+
+    if (shipMidX < blockMidX && shipRight > blockRect.x) {
+        printf("Collision on Right\n");
+        return 1; // Collision on the right side of the ship
+    }
+    if (shipMidX > blockMidX && shipRect.x < blockRight) {
+        printf("Collision on Left\n");
+        return 2; // Collision on the left side of the ship
+    }
+    if (shipMidY < blockMidY && shipBottom > blockRect.y) {
+        printf("Collision on Top\n");
+        return 3; // Collision on the top of the ship (ship is below)
+    }
+    if (shipMidY > blockMidY && shipRect.y < blockBottom) {
+        printf("Collision on Bottom\n");
+        return 4; // Collision on the bottom of the ship (ship is above)
+    }
+
+    return 0; // Fallback, should not be reached
 }
+
+
+
+void handleCollision(GameModel* model, SDL_Rect shipRect, SDL_Rect* blockPositions, int numBlocks, SDL_Renderer* renderer, SDL_Texture* blockTexture) {
+    bool anyCollision = false;
+    
+    for (int i = 0; i < numBlocks; i++) {
+        int collisionResult = checkCollision(shipRect, blockPositions[i]);
+        stopModel(model, collisionResult);
+        if(collisionResult != 0){
+            anyCollision = true;
+        }
+    }
+
+    if (!anyCollision) {
+        model->collisionRight = false; // Reset collision state if no collisions detected
+        model->collisionLeft = false;
+        model->collisionUp = false;
+        model->collisionDown = false;
+    }
+}
+
 
 void renderView(SDL_Renderer* renderer, SDL_Texture* shipTexture, SDL_Texture* backgroundTexture, SDL_Texture* blockTexture, GameModel* model) {
     SDL_RenderClear(renderer);
@@ -72,7 +137,6 @@ void renderView(SDL_Renderer* renderer, SDL_Texture* shipTexture, SDL_Texture* b
     //     {600, 400, 50, 50}, {650, 400, 50, 50}, {700, 400, 50, 50}, {750, 400, 50, 50}
     // };
         SDL_Rect blockPositions[] = {
-        
         {600, 400, 50, 50}
     };
     int numBlocks = sizeof(blockPositions) / sizeof(blockPositions[0]);
@@ -87,37 +151,15 @@ void renderView(SDL_Renderer* renderer, SDL_Texture* shipTexture, SDL_Texture* b
     SDL_RenderCopy(renderer, shipTexture, NULL, &shipRect);
 
 
+   handleCollision(model, shipRect, blockPositions, numBlocks, renderer, blockTexture);
+
+
     // Rendera blocken från listan
     for (int i = 0; i < numBlocks; i++) {
         placeTile(renderer, blockTexture, blockPositions[i].x, blockPositions[i].y);
-
-        if (checkCollision(shipRect, blockPositions[i]) == 1) {
-             printf("Krock till höger\n");
-             stopModel(model, 1); // Stoppa modellen (eller gör något annat beroende på vad du vill göra
-
-         }
-        // else if (checkCollision(shipRect, blockPositions[i]) == 2) {
-        //     printf("Krock från höger\n");
-        //     stopModel(model); // Stoppa modellen (eller gör något annat beroende på vad du vill göra
-        // }
-        // else if (checkCollision(shipRect, blockPositions[i]) == 3) {
-        //     printf("Krock uppifrån\n");
-        //     stopModel(model); // Stoppa modellen (eller gör något annat beroende på vad du vill göra
-        // }
-        // else if (checkCollision(shipRect, blockPositions[i]) == 4) {
-        //     printf("Krock underifrån\n");
-        //     stopModel(model); // Stoppa modellen (eller gör något annat beroende på vad du vill göra
-        // }
-
-        else (checkCollision(shipRect, blockPositions[i]) == 0); { // TODO fixa collisionsflaggorna till false
-            model->collisionRight = false;
-            printf("Ingen krock\n");
-        }
     }
 
     SDL_RenderPresent(renderer);
-
-
 }
 
 
