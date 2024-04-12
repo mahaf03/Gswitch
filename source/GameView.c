@@ -38,64 +38,35 @@ void loadBlock(SDL_Renderer* renderer, SDL_Texture** blockTexture) {
     SDL_FreeSurface(surface);
 }
 
-// int checkCollision(SDL_Rect shipRect, SDL_Rect blockRect) {
-    
-//     if((shipRect.x + shipRect.w > blockRect.x && shipRect.y + shipRect.h > blockRect.y) ||(shipRect.x + shipRect.w > blockRect.x && shipRect.y < blockRect.y + blockRect.h)){
-//         printf("1\n");
-//         return 1; //kollision höger
-//     } 
-//     else if(shipRect.x < blockRect.x + blockRect.w){
-//         printf("2\n");
-//         return 2; //kollision vänster
-//     }
-//     else if(shipRect.y + shipRect.h > blockRect.y){
-//         printf("3\n");
-//         return 3; //kollision uppifrån
-//     }
-//     else if(shipRect.y < blockRect.y + blockRect.h){
-//         printf("4\n");
-//         return 4; //kollision underifrån
-//     }
-//     else{
-//         printf("0\n");
-//         return 0;
-//     }
-// }
+int min(int a, int b) {
+    return (a < b) ? a : b;
+}
+
 int checkCollision(SDL_Rect shipRect, SDL_Rect blockRect) {
     // Check for no collision first
-    if (shipRect.x + shipRect.w <= blockRect.x ||  // ship is to the left of block
-        shipRect.x >= blockRect.x + blockRect.w || // ship is to the right of block
-        shipRect.y + shipRect.h <= blockRect.y ||  // ship is above block
-        shipRect.y >= blockRect.y + blockRect.h) { // ship is below block
+    if (shipRect.x + shipRect.w <= blockRect.x ||  // Ship is to the left of block
+        shipRect.x >= blockRect.x + blockRect.w || // Ship is to the right of block
+        shipRect.y + shipRect.h <= blockRect.y ||  // Ship is above block
+        shipRect.y >= blockRect.y + blockRect.h) { // Ship is below block
         return 0; // No collision
     }
 
-    // Determine the side of the collision
-    int shipRight = shipRect.x + shipRect.w;
-    int shipBottom = shipRect.y + shipRect.h;
-    int blockRight = blockRect.x + blockRect.w;
-    int blockBottom = blockRect.y + blockRect.h;
+    // Calculate overlaps on each side
+    int overlapLeft = shipRect.x + shipRect.w - blockRect.x;
+    int overlapRight = blockRect.x + blockRect.w - shipRect.x;
+    int overlapTop = shipRect.y + shipRect.h - blockRect.y;
+    int overlapBottom = blockRect.y + blockRect.h - shipRect.y;
 
-    // Horizontal collision detection
-    int shipMidX = shipRect.x + shipRect.w / 2;
-    int blockMidX = blockRect.x + blockRect.w / 2;
-    int shipMidY = shipRect.y + shipRect.h / 2;
-    int blockMidY = blockRect.y + blockRect.h / 2;
+    // Find the least overlap to determine the collision side
+    int minOverlap = min(min(overlapLeft, overlapRight), min(overlapTop, overlapBottom));
 
-    if (shipMidX < blockMidX && shipRight > blockRect.x) {
-        printf("Collision on Right\n");
+    if (minOverlap == overlapLeft) {
         return 1; // Collision on the right side of the ship
-    }
-    if (shipMidX > blockMidX && shipRect.x < blockRight) {
-        printf("Collision on Left\n");
+    } else if (minOverlap == overlapRight) {
         return 2; // Collision on the left side of the ship
-    }
-    if (shipMidY < blockMidY && shipBottom > blockRect.y) {
-        printf("Collision on Top\n");
+    } else if (minOverlap == overlapTop) {
         return 3; // Collision on the top of the ship (ship is below)
-    }
-    if (shipMidY > blockMidY && shipRect.y < blockBottom) {
-        printf("Collision on Bottom\n");
+    } else if (minOverlap == overlapBottom) {
         return 4; // Collision on the bottom of the ship (ship is above)
     }
 
@@ -109,10 +80,13 @@ void handleCollision(GameModel* model, SDL_Rect shipRect, SDL_Rect* blockPositio
     
     for (int i = 0; i < numBlocks; i++) {
         int collisionResult = checkCollision(shipRect, blockPositions[i]);
+        // printf("Collision result: %d\n", collisionResult);
         stopModel(model, collisionResult);
+        
         if(collisionResult != 0){
             anyCollision = true;
         }
+        
     }
 
     if (!anyCollision) {
@@ -128,17 +102,17 @@ void renderView(SDL_Renderer* renderer, SDL_Texture* shipTexture, SDL_Texture* b
     SDL_RenderClear(renderer);
 
     // Antag att dessa är dina blockpositioner
-    // SDL_Rect blockPositions[] = {
-    //     {0, 0, 50, 50}, {50, 0, 50, 50}, // Övre vänstra hörnet
-    //     {0, 750, 50, 50}, {50, 750, 50, 50}, {100, 750, 50, 50}, // Nedre vänstra hörnet
-    //     {150, 750, 50, 50}, {200, 750, 50, 50}, {250, 750, 50, 50}, // Fler positioner...
-    //     {500, 750, 50, 50}, {550, 750, 50, 50}, {600, 750, 50, 50},
-    //     {650, 750, 50, 50}, {700, 750, 50, 50},
-    //     {600, 400, 50, 50}, {650, 400, 50, 50}, {700, 400, 50, 50}, {750, 400, 50, 50}
-    // };
-        SDL_Rect blockPositions[] = {
-        {600, 400, 50, 50}
+    SDL_Rect blockPositions[] = {
+        {0, 0, 50, 50}, {50, 0, 50, 50}, // Övre vänstra hörnet
+        {0, 750, 50, 50}, {50, 750, 50, 50}, {100, 750, 50, 50}, // Nedre vänstra hörnet
+        {150, 750, 50, 50}, {200, 750, 50, 50}, {250, 750, 50, 50}, // Fler positioner...
+        {500, 750, 50, 50}, {550, 750, 50, 50}, {600, 750, 50, 50},
+        {650, 750, 50, 50}, {700, 750, 50, 50},
+        {600, 400, 50, 50}, {650, 400, 50, 50}, {700, 400, 50, 50}, {750, 400, 50, 50}
     };
+    //     SDL_Rect blockPositions[] = {
+    //     {600, 400, 50, 50}
+    // };
     int numBlocks = sizeof(blockPositions) / sizeof(blockPositions[0]);
 
     // Rendera bakgrunden
