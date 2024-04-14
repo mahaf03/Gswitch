@@ -7,7 +7,7 @@
 
 #include "Network.h"
 
-void initNetwork_Client( UDPsocket* sd, IPaddress* srvadd, UDPpacket *p, UDPpacket* pReceive)
+void initNetwork_Client( UDPsocket* sd, IPaddress* srvadd, UDPpacket* pReceive)
 {
   if (SDLNet_Init() <0)
     {
@@ -25,19 +25,9 @@ void initNetwork_Client( UDPsocket* sd, IPaddress* srvadd, UDPpacket *p, UDPpack
       fprintf(stderr, "SDLNet_ResolveHost(192.0.0.1 2000): %s\n", SDLNet_GetError());
       exit(EXIT_FAILURE);
     }
-  if (!(p = SDLNet_AllocPacket(512)))
-    {
-      fprintf(stderr, "SDLNet_AllocPacket: %s\n", SDLNet_GetError());
-      exit(EXIT_FAILURE);
-    }
-  if (!((pReceive= SDLNet_AllocPacket(512))))
-    {
-      fprintf(stderr, "SDLNet_AllocPacket: %s\n", SDLNet_GetError());
-      exit(EXIT_FAILURE);
-    }
 }
 
-void initNetwork_Server(UDPsocket* sd, UDPpacket* pReceive,UDPpacket* pSent)
+void initNetwork_Server(UDPsocket* sd)
 {
 
 	if (SDLNet_Init() < 0)
@@ -50,48 +40,54 @@ void initNetwork_Server(UDPsocket* sd, UDPpacket* pReceive,UDPpacket* pSent)
 		fprintf(stderr, "SDLNet_UDP_Open: %s\n", SDLNet_GetError());
 		exit(EXIT_FAILURE);
 	}
-	if (!((pSent = SDLNet_AllocPacket(512))&&(pReceive= SDLNet_AllocPacket(512))))
-      {
-		fprintf(stderr, "SDLNet_AllocPacket: %s\n", SDLNet_GetError());
-		exit(EXIT_FAILURE);
- 	}
 
 }
 
-void closeNetwork_Server(UDPsocket* sd, UDPpacket* pSent, UDPpacket* pReceive)
+void closeNetwork_Server(UDPsocket* sd, UDPpacket* pSent)
 {
-
     SDLNet_UDP_Close(*sd);
  	SDLNet_FreePacket(pSent);
-    SDLNet_FreePacket(pReceive);
 	SDLNet_Quit();
 }
 
-int receivePacket(struct udpData* packet, UDPsocket* sd, UDPpacket* pReceive)
+int receivePacket(struct udpData* packet, UDPsocket* sd)
   {
+    UDPpacket* pReceive;
+	if (!(pReceive= SDLNet_AllocPacket(512)))
+      {
+        fprintf(stderr, "SDLNet_AllocPacket: %s\n", SDLNet_GetError());
+        exit(EXIT_FAILURE);
+ 	}
     if(SDLNet_UDP_Recv(*sd,pReceive))
       {
         printf("packet received from host: \n\t %x\n",pReceive->address.host);
+
         memcpy(packet,pReceive->data,sizeof(struct udpData));
+        SDLNet_FreePacket(pReceive);
         return 1;
       }
     else
+        SDLNet_FreePacket(pReceive);
       return 0;
   }
 
-void sendPacket(UDPpacket* p, IPaddress* destAddr, UDPsocket* sd)
+void sendPacket(struct udpData Data, IPaddress* destAddr, UDPsocket* sd)
+//void sendPacket(UDPpacket* p, IPaddress* destAddr, UDPsocket* sd)
   {
-    printf("sending packet!\n");
-    p->data = "1 2 3\n";
-
     printf("data set!\n");
+    UDPpacket* p;
+    if (!(p = SDLNet_AllocPacket(512)))
+        {
+            fprintf(stderr, "SDLNet_AllocPacket: %s\n", SDLNet_GetError());
+            exit(EXIT_FAILURE);
+        }
+    //sprintf((char*)p->data,"%d %d %d\n",Data.xPos,Data.yPos,Data.status);
+    memcpy(p->data,&Data,sizeof(struct udpData));
     //sprintf((char*)p->data,"%d %d %d\n", (uint)1,(int)2,(int)3);
     p->address.host = destAddr->host;
     p->address.port = destAddr->port;	/* And destination port */
-    //printf("datalengnth %d \n",strlen((char *)p->data) + 1);
-    //p->len = strlen((char *)p->data) + 1;
-    printf("stringlength set \n");
+    p->len =sizeof(struct udpData);
     SDLNet_UDP_Send(*sd, -1, p);
-
     printf("packet sent!!\n");
+    SDLNet_FreePacket(p);
   }

@@ -7,21 +7,31 @@
 int main(int argc,char** argv)
   {
     UDPsocket sd;
-    UDPpacket *pReceive;
     UDPpacket* pSent;
     printf("opening server..\n");
-    initNetwork_Server (&sd,pReceive,pSent);
 
-    printf("closing server..\n");
-    //sd = SDLNet_UDP_Open(NETWORK_PORT);
-    struct udpData message;
-    for (int i= 0;i<10;i++)
+    initNetwork_Server (&sd);
+
+	//if (!((pSent = SDLNet_AllocPacket(512))&&(pReceive= SDLNet_AllocPacket(512))))
+	if (!((pSent = SDLNet_AllocPacket(512))))
       {
-        if(receivePacket(&message,&sd,pReceive) ==1)
-          printf("New packet received!\n");
-        SDL_Delay(1000);
+        fprintf(stderr, "SDLNet_AllocPacket: %s\n", SDLNet_GetError());
+        exit(EXIT_FAILURE);
+ 	}
+
+    struct udpData message;
+    int quit = 0;
+    while (quit==0)
+      {
+        if(receivePacket(&message,&sd) ==1)
+          {
+            printf("New packet received!\n\t %x %x %x \n",message.xPos,message.yPos,message.status);
+            if (message.status == 3)
+              {quit = 1;}
+          }
+        //SDL_Delay(1000);
       }
-    closeNetwork_Server(&sd,pReceive,pSent);
+    closeNetwork_Server(&sd,pSent);
     printf("server closed..\n");
     return 0;
   }

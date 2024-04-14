@@ -16,9 +16,10 @@ struct udpData{
   int yPos; // players y-coordinate
   int status; //idk what this is
     };
-void initNetwork_Client( UDPsocket* sd, IPaddress* srvadd, UDPpacket *p, UDPpacket* pRecieve);
-void initNetwork_Server(UDPsocket* sd, UDPpacket* pReceive,UDPpacket* pSent);
-void closeNetwork_Server(UDPsocket* sd, UDPpacket* pSent, UDPpacket* pReceive);
-int receivePacket(struct udpData* packet, UDPsocket* sd, UDPpacket* pReceive);
-void sendPacket(UDPpacket* p, IPaddress* destAddr, UDPsocket* sd);
+void initNetwork_Client( UDPsocket* sd, IPaddress* srvadd, UDPpacket* pRecieve);
+void initNetwork_Server(UDPsocket* sd);
+//void closeNetwork_Server(UDPsocket* sd, UDPpacket* pSent, UDPpacket* pReceive);
+void closeNetwork_Server(UDPsocket* sd, UDPpacket* pSent);
+int receivePacket(struct udpData* packet, UDPsocket* sd);
+void sendPacket(struct udpData Data, IPaddress* destAddr, UDPsocket* sd);
 #endif

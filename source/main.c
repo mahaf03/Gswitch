@@ -23,19 +23,33 @@ int main(int argv, char** args) {
     IPaddress srvadd;
     UDPpacket* pReceive;
     UDPpacket* p;
-    initNetwork_Client(&sd,&srvadd,p,pReceive);
+    initNetwork_Client(&sd,&srvadd,pReceive);
     printf("Network initialized!\n");
+    //Allocate memory for UDP packets
+    if (!(p = SDLNet_AllocPacket(512)))
+        {
+            fprintf(stderr, "SDLNet_AllocPacket: %s\n", SDLNet_GetError());
+            exit(EXIT_FAILURE);
+        }
+    if (!((pReceive= SDLNet_AllocPacket(512))))
+        {
+            fprintf(stderr, "SDLNet_AllocPacket: %s\n", SDLNet_GetError());
+            exit(EXIT_FAILURE);
+        }
+
+
 
     bool closeWindow = false;
     while (!closeWindow) {
         SDL_Event event;
         while (SDL_PollEvent(&event)) {
             handleEvent(&event, &model, &closeWindow);
-            struct udpData testdata ={1,3,1};
+            struct udpData testdata ={1,1,0};
             printf("sending data \n\t %d %d %d\n",testdata.xPos,testdata.yPos,testdata.status);
-            //sprintf((char*)p->data,"%d %d %d\n", 1,2,3);
-
-            sendPacket(p,&srvadd,&sd);
+            //send a message to server, if testdata.status == 3 then the server shuts down.
+            if (model.x >= 400.f)
+                { testdata.status =3;}
+            sendPacket(testdata,&srvadd,&sd);
             printf("data sent!\n");
         }
 
