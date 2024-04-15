@@ -9,27 +9,56 @@ int main(int argc,char** argv)
     UDPsocket sd;
     UDPpacket* pSent;
     printf("opening server..\n");
-
+    udpDataToClient dataSend= {};
+    dataSend.status = 0;
+    IPaddress players[4];
+            for (int i = 0;i<4;i++)
+              {
+                IPaddress empty = {0,0};
+                players[i]= empty;
+              }
     initNetwork_Server (&sd);
-
-	//if (!((pSent = SDLNet_AllocPacket(512))&&(pReceive= SDLNet_AllocPacket(512))))
-	if (!((pSent = SDLNet_AllocPacket(512))))
+    if (!((pSent = SDLNet_AllocPacket(512))))
       {
         fprintf(stderr, "SDLNet_AllocPacket: %s\n", SDLNet_GetError());
         exit(EXIT_FAILURE);
- 	}
+      }
 
-    struct udpData message;
+    udpDataToServer message;
     int quit = 0;
     while (quit==0)
       {
-        if(receivePacket(&message,&sd) ==1)
+        IPaddress host;
+         host = serverReceivePacket(&message,&sd);
+         if( host.host != 0 && host.port !=0)
           {
-            printf("New packet received!\n\t %x %x %x \n",message.xPos,message.yPos,message.status);
+            int playerNo = 0;
+            for (int i = 0;i<4;i++)
+              {
+                if ((players[i].host  == 0 && players[i].port ==0 ) || (host.host== players [i].host&& host.port == players[i].port))
+                  {
+                    if(players[i].host  == 0)
+                      {
+                        dataSend.playercount++;
+                        printf("Player %d connected! \n \t %x \n \t %d\n", i+1, host.host,host.port);
+                      }
+                    players[i] = host;
+                    playerNo = i+1;
+                    break;
+                  }
+              }
+            printf("New packet received from Player %d at %x !\n\t %f %f %d \n",playerNo,host.host,message.xPos,message.yPos,message.status);
+            struct PlayerPos position = {message.xPos,message.yPos};
+            dataSend.playerPositions[playerNo-1] = position;
             if (message.status == 3)
               {quit = 1;}
+            for (int i = 0; i< dataSend.playercount; i++)
+              {
+                serverSendPacket (dataSend,&players[i],&sd);
+              }
+
           }
-        //SDL_Delay(1000);
+                 SDL_Delay(50); // Approximate 60 FPS
       }
     closeNetwork_Server(&sd,pSent);
     printf("server closed..\n");

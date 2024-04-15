@@ -15,7 +15,12 @@ int main(int argv, char** args) {
 
     GameModel model;
     initializeModel(&model);
-    
+    GameModel models[4];
+    int playercount = 0;
+    for (int i=0;i<4;i++)
+        {
+            initializeModel(&models[i]);
+        }
     // Du måste också passera en pekare till bakgrundstexturen till initView
     initView(&renderer, &window, &texture, &bgTexture);
     printf("initializing network... \n");
@@ -37,27 +42,46 @@ int main(int argv, char** args) {
             exit(EXIT_FAILURE);
         }
 
-
-
     bool closeWindow = false;
     while (!closeWindow) {
         SDL_Event event;
         while (SDL_PollEvent(&event)) {
             handleEvent(&event, &model, &closeWindow);
-            struct udpData testdata ={1,1,0};
-            printf("sending data \n\t %d %d %d\n",testdata.xPos,testdata.yPos,testdata.status);
+            udpDataToServer testdata ={model.x,model.y,0};
+            //printf("sending data \n\t %f %f %d\n",testdata.xPos,testdata.yPos,testdata.status);
             //send a message to server, if testdata.status == 3 then the server shuts down.
             if (model.x >= 400.f)
                 { testdata.status =3;}
-            sendPacket(testdata,&srvadd,&sd);
-            printf("data sent!\n");
+            clientSendPacket(testdata,&srvadd,&sd);
+
+            //printf("data sent!\n");
         }
+        udpDataToClient message;
+        IPaddress addrr = clientReceivePacket(&message,&sd);
+        if(addrr.host !=0 && addrr.port !=0  )
+            {
+                printf( "new message from %x:\n",addrr.host);
+                    playercount = message.playercount;
+                    for(int i = 0; i< message.playercount; i++)
+                        {
+                            printf("\tplayer %d at %f %f\n",i,message.playerPositions[i].x,message.playerPositions[i].y);
+                            models[i].x = message.playerPositions[i].x;
+                            models[i].y = message.playerPositions[i].y;
+                        }
+            }
+        for (int i = 0; i<playercount;i++)
+            {
+                models[i].x=message.playerPositions[i].x;
+                models[i].y=message.playerPositions[i].y;
+                updateModel(&models[i]);
+            }
 
         updateModel(&model);
         
         // Uppdatera renderView-anropet för att inkludera bakgrundstexturen
-        renderView(renderer, texture, bgTexture, &model);
-        
+        renderView(renderer, texture, bgTexture, &models[0],playercount);
+        //renderView(renderer, texture, bgTexture, &model,1);
+
         SDL_Delay(1000 / 60); // Approximate 60 FPS
     }
 

@@ -47,47 +47,73 @@ void closeNetwork_Server(UDPsocket* sd, UDPpacket* pSent)
 {
     SDLNet_UDP_Close(*sd);
  	SDLNet_FreePacket(pSent);
-	SDLNet_Quit();
+    SDLNet_Quit();
 }
-
-int receivePacket(struct udpData* packet, UDPsocket* sd)
-  {
-    UDPpacket* pReceive;
-	if (!(pReceive= SDLNet_AllocPacket(512)))
-      {
-        fprintf(stderr, "SDLNet_AllocPacket: %s\n", SDLNet_GetError());
-        exit(EXIT_FAILURE);
- 	}
-    if(SDLNet_UDP_Recv(*sd,pReceive))
-      {
-        printf("packet received from host: \n\t %x\n",pReceive->address.host);
-
-        memcpy(packet,pReceive->data,sizeof(struct udpData));
-        SDLNet_FreePacket(pReceive);
-        return 1;
-      }
-    else
-        SDLNet_FreePacket(pReceive);
-      return 0;
-  }
-
-void sendPacket(struct udpData Data, IPaddress* destAddr, UDPsocket* sd)
-//void sendPacket(UDPpacket* p, IPaddress* destAddr, UDPsocket* sd)
-  {
-    printf("data set!\n");
+void serverSendPacket(udpDataToClient Data, IPaddress* destAddr, UDPsocket* sd)
+{
     UDPpacket* p;
     if (!(p = SDLNet_AllocPacket(512)))
         {
             fprintf(stderr, "SDLNet_AllocPacket: %s\n", SDLNet_GetError());
             exit(EXIT_FAILURE);
         }
-    //sprintf((char*)p->data,"%d %d %d\n",Data.xPos,Data.yPos,Data.status);
-    memcpy(p->data,&Data,sizeof(struct udpData));
-    //sprintf((char*)p->data,"%d %d %d\n", (uint)1,(int)2,(int)3);
+    memcpy(p->data,&Data,sizeof(udpDataToClient));
     p->address.host = destAddr->host;
     p->address.port = destAddr->port;	/* And destination port */
-    p->len =sizeof(struct udpData);
+    p->len =sizeof(udpDataToClient);
     SDLNet_UDP_Send(*sd, -1, p);
-    printf("packet sent!!\n");
+    SDLNet_FreePacket(p);
+}
+IPaddress serverReceivePacket(udpDataToServer* packet, UDPsocket* sd)
+  {
+    UDPpacket* pReceive;
+    if (!(pReceive= SDLNet_AllocPacket(512)))
+      {
+        fprintf(stderr, "SDLNet_AllocPacket: %s\n", SDLNet_GetError());
+        exit(EXIT_FAILURE);
+      }
+    if(SDLNet_UDP_Recv(*sd,pReceive))
+      {
+        memcpy(packet,pReceive->data,sizeof(udpDataToServer));
+        SDLNet_FreePacket(pReceive);
+        return pReceive->address;
+      }
+    IPaddress empty = {0,0};
+    SDLNet_FreePacket(pReceive);
+    return empty;
+  }
+
+void clientSendPacket(udpDataToServer Data, IPaddress* destAddr, UDPsocket* sd)
+  {
+    UDPpacket* p;
+    if (!(p = SDLNet_AllocPacket(512)))
+        {
+            fprintf(stderr, "SDLNet_AllocPacket: %s\n", SDLNet_GetError());
+            exit(EXIT_FAILURE);
+        }
+    memcpy(p->data,&Data,sizeof(udpDataToServer));
+    p->address.host = destAddr->host;
+    p->address.port = destAddr->port;	/* And destination port */
+    p->len =sizeof(udpDataToServer);
+    SDLNet_UDP_Send(*sd, -1, p);
     SDLNet_FreePacket(p);
   }
+
+IPaddress clientReceivePacket(udpDataToClient* packet, UDPsocket* sd)
+  {
+    UDPpacket* pReceive;
+    if (!(pReceive= SDLNet_AllocPacket(512)))
+      {
+        fprintf(stderr, "SDLNet_AllocPacket: %s\n", SDLNet_GetError());
+        exit(EXIT_FAILURE);
+      }
+    if(SDLNet_UDP_Recv(*sd,pReceive))
+      {
+        memcpy(packet,pReceive->data,sizeof(udpDataToClient));
+        SDLNet_FreePacket(pReceive);
+        return pReceive->address;
+      }
+    IPaddress empty = {0,0};
+    SDLNet_FreePacket(pReceive);
+    return empty;
+    }

@@ -49,7 +49,7 @@ void loadBackground(SDL_Renderer* renderer, SDL_Texture** backgroundTexture) {
     SDL_FreeSurface(surface);
 }
 
-void renderView(SDL_Renderer* renderer, SDL_Texture* shipTexture, SDL_Texture* backgroundTexture, GameModel* model) {
+void renderView(SDL_Renderer* renderer, SDL_Texture* shipTexture, SDL_Texture* backgroundTexture, GameModel* model,int modelCount) {
     SDL_RenderClear(renderer);
 
     // Först, rendera bakgrundstexturen
@@ -58,8 +58,12 @@ void renderView(SDL_Renderer* renderer, SDL_Texture* shipTexture, SDL_Texture* b
     }
 
     // Sedan, rendera skeppet
-    SDL_Rect shipRect = { (int)model->x, (int)model->y, 50, 50 }; // Justera storlek som behövs
-    SDL_RenderCopy(renderer, shipTexture, NULL, &shipRect);
+    for (int i = 0; i<modelCount; i++)
+        {
+            SDL_Rect shipRect = { (int)model->x, (int)model->y, 50, 50 }; // Justera storlek som behövs
+            SDL_RenderCopy(renderer, shipTexture, NULL, &shipRect);
+            model++;
+        }
 
     SDL_RenderPresent(renderer);
 }
