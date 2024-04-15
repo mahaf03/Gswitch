@@ -11,6 +11,8 @@
 #define NETWORK_PORT (49156)
 #define SERVERADDRESS "127.0.0.1" // Placeholder for server network address
 //struct defining data sent between client and server
+static UDPpacket* pReceive;
+static UDPpacket* p;
 typedef struct udpDataToServer{
   float xPos; // players x-coordinate
   float yPos; // players y-coordinate
@@ -26,12 +28,12 @@ typedef struct udpDataToClient{
   playerPos playerPositions[4];// players x&y-coordinates
   int status; //idk what this is
     } udpDataToClient;
-void initNetwork_Client( UDPsocket* sd, IPaddress* srvadd, UDPpacket* pRecieve);
+void initNetwork_Client( UDPsocket* sd, IPaddress* srvadd);
 void initNetwork_Server(UDPsocket* sd);
 void closeNetwork_Server(UDPsocket* sd, UDPpacket* pSent) ;
 IPaddress serverReceivePacket(udpDataToServer* packet, UDPsocket* sd);
 void serverSendPacket(udpDataToClient Data, IPaddress* destAddr, UDPsocket* sd);
 void clientSendPacket(udpDataToServer Data, IPaddress* destAddr, UDPsocket* sd);
 IPaddress clientReceivePacket(udpDataToClient* packet, UDPsocket* sd);
-
+void closeNetwork_Client(UDPsocket* sd);
 #endif
