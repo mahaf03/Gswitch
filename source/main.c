@@ -33,10 +33,15 @@ int main(int argv, char** args) {
             handleEvent(&event, &model, &closeWindow);
         }
 
-        updateModel(&model);
-        updateBlocks(&model); // Lägg till denna rad för att uppdatera blocken
+        //Skapa ship
+        // SDL_Rect shipRect = { (int)model->x, (int)model->y, 50, 50 };
+        SDL_Rect shipRect = { (int)model.x, (int)model.y, 50, 50 };
 
-        renderView(renderer, texture, bgTexture, blockTexture, &model);
+
+        updateModel(&model);
+        updateBlocks(&model,shipRect); // Lägg till denna rad för att uppdatera blocken
+
+        renderView(renderer, texture, bgTexture, blockTexture, &model,shipRect);
 
         frameTime = SDL_GetTicks() - frameStart; // Hur länge det tog att processa ramen
 

@@ -1,6 +1,6 @@
 // GameView.c
-#include "GameView.h"
 #include <SDL2/SDL_image.h>
+#include "GameView.h"
 #include <stdbool.h>
 #include "GameController.h"
 #include "GameModel.h"
@@ -42,26 +42,20 @@ void loadBlock(SDL_Renderer* renderer, SDL_Texture** blockTexture) {
 
 
 
-
-
-
-
-void renderView(SDL_Renderer* renderer, SDL_Texture* shipTexture, SDL_Texture* backgroundTexture, SDL_Texture* blockTexture, GameModel* model) {
+void renderView(SDL_Renderer* renderer, SDL_Texture* shipTexture, SDL_Texture* backgroundTexture, SDL_Texture* blockTexture, GameModel* model, SDL_Rect shipRect) {
     SDL_RenderClear(renderer);
 
     // Antag att dessa är dina blockpositioner
-    SDL_Rect blockPositions[] = {
-        {0, 0, 50, 50}, {50, 0, 50, 50}, // Övre vänstra hörnet
-        {0, 750, 50, 50}, {50, 750, 50, 50}, {100, 750, 50, 50},{150, 750, 50, 50}, // Nedre vänstra hörnet
-        {150, 750, 50, 50}, {200, 750, 50, 50}, {250, 750, 50, 50}, // Fler positioner...
-        {500, 750, 50, 50}, {550, 750, 50, 50}, {600, 750, 50, 50},
-        {650, 750, 50, 50}, {700, 750, 50, 50},
-        {600, 400, 50, 50}, {650, 400, 50, 50}, {700, 400, 50, 50}, {750, 400, 50, 50}, {800, 400, 50, 50},
-    };
-    //     SDL_Rect blockPositions[] = {
-    //     {600, 400, 50, 50}
+    // SDL_Rect blockPositions[] = { Gammla blocken
+    //     {0, 0, 50, 50}, {50, 0, 50, 50}, // Övre vänstra hörnet
+    //     {0, 750, 50, 50}, {50, 750, 50, 50}, {100, 750, 50, 50},{150, 750, 50, 50}, // Nedre vänstra hörnet
+    //     {150, 750, 50, 50}, {200, 750, 50, 50}, {250, 750, 50, 50}, // Fler positioner...
+    //     {500, 750, 50, 50}, {550, 750, 50, 50}, {600, 750, 50, 50},
+    //     {650, 750, 50, 50}, {700, 750, 50, 50},
+    //     {600, 400, 50, 50}, {650, 400, 50, 50}, {700, 400, 50, 50}, {750, 400, 50, 50}, {800, 400, 50, 50},
     // };
-    int numBlocks = sizeof(blockPositions) / sizeof(blockPositions[0]);
+
+    // int numBlocks = sizeof(blockPositions) / sizeof(blockPositions[0]);
 
     // Rendera bakgrunden
     if (backgroundTexture) {
@@ -69,18 +63,18 @@ void renderView(SDL_Renderer* renderer, SDL_Texture* shipTexture, SDL_Texture* b
     }
 
     // Rendera skeppet
-    SDL_Rect shipRect = { (int)model->x, (int)model->y, 50, 50 };
+    // SDL_Rect shipRect = { (int)model->x, (int)model->y, 50, 50 };
     SDL_RenderCopy(renderer, shipTexture, NULL, &shipRect);
 
 
-   handleCollision(model, shipRect, blockPositions, numBlocks, renderer, blockTexture);
+//    handleCollision(model, shipRect, blockPositions, numBlocks, renderer, blockTexture); Gammla kollision med gamla blocken
 
 
     // Rendera blocken från listan
     // for (int i = 0; i < numBlocks; i++) {
     //     placeTile(renderer, blockTexture, blockPositions[i].x, blockPositions[i].y);
     // }
-        for (int i = 0; i < 20; i++) {
+    for (int i = 0; i < 20; i++) {
         placeTile(renderer, blockTexture, model->blockPositions[i].x, model->blockPositions[i].y);
     }
 

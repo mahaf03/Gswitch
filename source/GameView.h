@@ -9,7 +9,7 @@
 // void renderView(SDL_Renderer* renderer, SDL_Texture* texture, GameModel* model);
 // void closeView(SDL_Renderer* renderer, SDL_Window* window, SDL_Texture* texture);
 void initView(SDL_Renderer** renderer, SDL_Window** window, SDL_Texture** texture, SDL_Texture** backgroundTexture , SDL_Texture** blockTexture);
-void renderView(SDL_Renderer* renderer, SDL_Texture* shipTexture, SDL_Texture* backgroundTexture,SDL_Texture* blockTexture, GameModel* model);
+void renderView(SDL_Renderer* renderer, SDL_Texture* shipTexture, SDL_Texture* backgroundTexture,SDL_Texture* blockTexture, GameModel* model, SDL_Rect shipRect);
 void closeView(SDL_Renderer* renderer, SDL_Window* window, SDL_Texture* shipTexture, SDL_Texture* backgroundTexture, SDL_Texture* blockTexture);
 void loadBackground(SDL_Renderer* renderer, SDL_Texture** backgroundTexture);
 void loadBlock(SDL_Renderer* renderer, SDL_Texture** blockTexture);

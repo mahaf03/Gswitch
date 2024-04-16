@@ -36,11 +36,13 @@ void initializeModel(GameModel* model) {
     }
 }
 
-void updateBlocks(GameModel* model) {
+void updateBlocks(GameModel* model, SDL_Rect shipRect) {
+        // Hantera kollisioner för varje block
+        handleCollision(model, shipRect, model->blockPositions, 20);
+    
     for (int i = 0; i < 20; i++) {
         // Uppdatera x-positionen för varje block
         model->blockPositions[i].x -= model->blockSpeed;
-
         // Kontrollera om blocket har passerat skärmens vänstra kant
         if (model->blockPositions[i].x < -model->blockPositions[i].w) {
             // Återställ blocket till höger utanför skärmen
@@ -55,69 +57,60 @@ int min(int a, int b) {
     return (a < b) ? a : b;
 }
 
-int checkCollision(SDL_Rect shipRect, SDL_Rect blockRect) {
-    if (shipRect.x + shipRect.w <= blockRect.x ||
-        shipRect.x >= blockRect.x + blockRect.w ||
-        shipRect.y + shipRect.h <= blockRect.y ||
-        shipRect.y >= blockRect.y + blockRect.h) {
-        return 0;
+int checkCollision(SDL_Rect* a, SDL_Rect* b) {
+    // Beräkna sidorna av rect A och B
+    int leftA = a->x;
+    int rightA = a->x + a->w;
+    int topA = a->y;
+    int bottomA = a->y + a->h;
+
+    int leftB = b->x;
+    int rightB = b->x + b->w;
+    int topB = b->y;
+    int bottomB = b->y + b->h;
+
+    // Om någon av sidorna från A inte kolliderar med B
+    if (bottomA <= topB || topA >= bottomB || rightA <= leftB || leftA >= rightB) {
+        return 0; // Ingen kollision
     }
 
-    int overlapLeft = shipRect.x + shipRect.w - blockRect.x;
-    int overlapRight = blockRect.x + blockRect.w - shipRect.x;
-    int overlapTop = shipRect.y + shipRect.h - blockRect.y;
-    int overlapBottom = blockRect.y + blockRect.h - shipRect.y;
-
-    int minOverlap = min(min(overlapLeft, overlapRight), min(overlapTop, overlapBottom));
-
-    if (minOverlap == overlapLeft) {
-        return 1;
-    } else if (minOverlap == overlapRight) {
-        return 2;
-    } else if (minOverlap == overlapTop) {
-        return 3;
-    } else if (minOverlap == overlapBottom) {
-        return 4;
-    }
-
-    return 0;
+    // Annars finns det en kollision
+    return 1;
 }
 
-void handleCollision(GameModel* model, SDL_Rect shipRect, SDL_Rect* blockPositions, int numBlocks, SDL_Renderer* renderer, SDL_Texture* blockTexture) {
-    bool anyCollision = false;
-    
-    for (int i = 0; i < numBlocks; i++) {
-        int collisionResult = checkCollision(shipRect, blockPositions[i]);
-        
-        switch(collisionResult) {
-            case 1: // Collision on the right side of the ship
-                model->collisionLeft = true;
-                model->x -= shipRect.x + shipRect.w - blockPositions[i].x;
-                break;
-            case 2: // Collision on the left side of the ship
-                model->collisionRight = true;
-                model->x += blockPositions[i].x + blockPositions[i].w - shipRect.x;
-                break;
-            case 3: // Collision on the top of the ship (ship is below)
-                model->collisionDown = true;
-                model->y -= shipRect.y + shipRect.h - blockPositions[i].y;
-                break;
-            case 4: // Collision on the bottom of the ship (ship is above)
-                model->collisionUp = true;
-                model->y += blockPositions[i].y + blockPositions[i].h - shipRect.y;
-                break;
-        }
+void handleCollision(GameModel* model, SDL_Rect shipRect, SDL_Rect* blockPositions, int numBlocks) {
+    bool collisionDetected = false;
 
-        if(collisionResult != 0){
-            anyCollision = true;
+    for (int i = 0; i < numBlocks; i++) {
+        if (checkCollision(&shipRect, &blockPositions[i])) {
+            collisionDetected = true;
+
+            // Hantera kollision genom att stoppa spelarens rörelse eller justera position
+            // Exempel: Stoppa spelaren från att röra sig in i blocket
+            if (shipRect.y < blockPositions[i].y) {
+                // Kollision underifrån
+                model->y = blockPositions[i].y - shipRect.h;
+            } else if (shipRect.y > blockPositions[i].y) {
+                // Kollision ovanifrån
+                model->y = blockPositions[i].y + blockPositions[i].h;
+            }
+
+            if (shipRect.x < blockPositions[i].x) {
+                // Kollision till höger
+                model->x = blockPositions[i].x - shipRect.w;
+            } else if (shipRect.x > blockPositions[i].x) {
+                // Kollision till vänster
+                model->x = blockPositions[i].x + blockPositions[i].w;
+            }
         }
-        
     }
 
-    if (!anyCollision) {
+    if (!collisionDetected) {
         model->collisionRight = false;
         model->collisionLeft = false;
         model->collisionUp = false;
         model->collisionDown = false;
     }
 }
+
+
