@@ -60,11 +60,19 @@ void handleEvent(SDL_Event* event, GameModel* model, bool* closeWindow) {
             break;
     }
 }
-
+void applyGravity(GameModel* model) {
+    const float gravity = 3.0f;  
+   
+    if (!model->collisionDown) {
+        model->velocityY += gravity;
+    }
+}
 
 void updateModel(GameModel* model) {
     const float speed = 4.5f;
     model->velocityX = model->velocityY = 0;
+
+    // applyGravity(model);
 
     if (model->up && !model->down && !model->collisionUp) model->velocityY = -speed;
     if (model->down && !model->up && !model->collisionDown) model->velocityY = speed;
