@@ -77,8 +77,11 @@ void renderView(SDL_Renderer* renderer, SDL_Texture* shipTexture, SDL_Texture* b
 
 
     // Rendera blocken från listan
-    for (int i = 0; i < numBlocks; i++) {
-        placeTile(renderer, blockTexture, blockPositions[i].x, blockPositions[i].y);
+    // for (int i = 0; i < numBlocks; i++) {
+    //     placeTile(renderer, blockTexture, blockPositions[i].x, blockPositions[i].y);
+    // }
+        for (int i = 0; i < 20; i++) {
+        placeTile(renderer, blockTexture, model->blockPositions[i].x, model->blockPositions[i].y);
     }
 
     SDL_RenderPresent(renderer);

@@ -1,12 +1,54 @@
 #include "GameModel.h"
 #include "GameView.h"
+#include <stdlib.h> // För rand() och srand()
+#include <time.h>   // För time()
+
+// void initializeModel(GameModel* model) {
+//     model->x = 200;
+//     model->y = 200;
+//     model->velocityX = model->velocityY = 0;
+//     model->up = model->down = model->left = model->right = false;
+//     model->collisionUp = model->collisionDown = model->collisionLeft = model->collisionRight = false;
+// }
 
 void initializeModel(GameModel* model) {
+   // Initialisera slumpgeneratorn
+    srand((unsigned int)time(NULL));
+
+    // Sätt spelarens initiala position och hastighet
     model->x = 200;
     model->y = 200;
     model->velocityX = model->velocityY = 0;
+
+    // Initialisera spelarkontroller
     model->up = model->down = model->left = model->right = false;
+
+    // Initialisera kollisionsstatusar
     model->collisionUp = model->collisionDown = model->collisionLeft = model->collisionRight = false;
+
+    // Sätt hastigheten för blocken och initialisera deras positioner
+    model->blockSpeed = 10; // Ange hastigheten för blocken
+    for (int i = 0; i < 20; i++) {
+        model->blockPositions[i].x = 1000 + i * 50; // Startar till höger utanför skärmen
+        model->blockPositions[i].y = rand() % 750; // Ett slumpmässigt y-värde
+        model->blockPositions[i].w = 50;
+        model->blockPositions[i].h = 50;
+    }
+}
+
+void updateBlocks(GameModel* model) {
+    for (int i = 0; i < 20; i++) {
+        // Uppdatera x-positionen för varje block
+        model->blockPositions[i].x -= model->blockSpeed;
+
+        // Kontrollera om blocket har passerat skärmens vänstra kant
+        if (model->blockPositions[i].x < -model->blockPositions[i].w) {
+            // Återställ blocket till höger utanför skärmen
+            model->blockPositions[i].x = 1000;
+            // Ge det en ny y-position
+            model->blockPositions[i].y = rand() % (750 - model->blockPositions[i].h);
+        }
+    }
 }
 
 int min(int a, int b) {

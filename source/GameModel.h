@@ -10,7 +10,10 @@ typedef struct {
     float velocityX, velocityY; // Player's velocity
     bool up, down, left, right; // Direction flags
     bool collisionUp, collisionDown, collisionLeft, collisionRight; // Collision flags
+    SDL_Rect blockPositions[20]; // Antal block du vill ha
+    int blockSpeed;
 } GameModel;
+
 
 void initializeModel(GameModel* model);
 int min(int a, int b);

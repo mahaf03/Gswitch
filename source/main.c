@@ -16,7 +16,6 @@ int main(int argv, char** args) {
     GameModel model;
     initializeModel(&model);
     
-    // Du måste också passera en pekare till bakgrundstexturen till initView
     initView(&renderer, &window, &texture, &bgTexture, &blockTexture);
 
     const int FPS = 60;
@@ -25,18 +24,18 @@ int main(int argv, char** args) {
     Uint32 frameStart;
     int frameTime;
 
-
     bool closeWindow = false;
-    while (!closeWindow) {          // Game Loop
+    while (!closeWindow) { // Game Loop
         frameStart = SDL_GetTicks(); // Tidpunkten då ramen startar
+
         SDL_Event event;
         while (SDL_PollEvent(&event)) {
             handleEvent(&event, &model, &closeWindow);
         }
 
         updateModel(&model);
-        
-        // Uppdatera renderView-anropet för att inkludera bakgrundstexturen
+        updateBlocks(&model); // Lägg till denna rad för att uppdatera blocken
+
         renderView(renderer, texture, bgTexture, blockTexture, &model);
 
         frameTime = SDL_GetTicks() - frameStart; // Hur länge det tog att processa ramen
@@ -44,11 +43,8 @@ int main(int argv, char** args) {
         if (frameDelay > frameTime) {
             SDL_Delay(frameDelay - frameTime);
         }
-        
-        // SDL_Delay(1000 / 60); // Approximate 60 FPS
     }
 
-    // Glöm inte att skicka bgTexture till closeView så att det också kan rensas upp
     closeView(renderer, window, texture, bgTexture, blockTexture);
     SDL_Quit();
     return 0;
