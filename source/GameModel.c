@@ -29,7 +29,7 @@ void initializeModel(GameModel* model) {
     // Sätt hastigheten för blocken och initialisera deras positioner
     model->blockSpeed = 10; // Ange hastigheten för blocken
     for (int i = 0; i < 20; i++) {
-        model->blockPositions[i].x = 1000 + i * 50; // Startar till höger utanför skärmen
+        model->blockPositions[i].x = 1200 + i * 50; // Startar till höger utanför skärmen
         model->blockPositions[i].y = rand() % 750; // Ett slumpmässigt y-värde
         model->blockPositions[i].w = 50;
         model->blockPositions[i].h = 50;
@@ -46,7 +46,7 @@ void updateBlocks(GameModel* model, SDL_Rect shipRect) {
         // Kontrollera om blocket har passerat skärmens vänstra kant
         if (model->blockPositions[i].x < -model->blockPositions[i].w) {
             // Återställ blocket till höger utanför skärmen
-            model->blockPositions[i].x = 1000;
+            model->blockPositions[i].x = 1200;
             // Ge det en ny y-position
             model->blockPositions[i].y = rand() % (750 - model->blockPositions[i].h);
         }
