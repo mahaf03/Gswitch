@@ -69,7 +69,7 @@ void applyGravity(GameModel* model) {
 }
 
 void updateModel(GameModel* model) {
-    const float speed = 4.5f;
+    const float speed = 7.0f;
     model->velocityX = model->velocityY = 0;
 
     // applyGravity(model);
