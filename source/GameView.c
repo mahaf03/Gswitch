@@ -62,8 +62,7 @@ void renderView(SDL_Renderer* renderer, SDL_Texture* shipTexture, SDL_Texture* b
         SDL_RenderCopy(renderer, backgroundTexture, NULL, NULL);
     }
 
-    // Rendera skeppet
-    // SDL_Rect shipRect = { (int)model->x, (int)model->y, 50, 50 };
+    // Sedan, rendera skeppet
     SDL_RenderCopy(renderer, shipTexture, NULL, &shipRect);
 
 
