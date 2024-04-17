@@ -1,24 +1,7 @@
 # Makefile for Windows
-# SRCDIR=./source
-# CC=gcc
-# INCLUDE = C:\msys64\mingw64\include\SDL2
 
-# CFLAGS = -g -I$(INCLUDE) -c 
-# LDFLAGS = -lmingw32 -lSDL2main -lSDL2_image -lSDL2 -mwindows -lm
-
-# simpleSDLexample1: main.o
-# 	$(CC) main.o -o simpleSDLexample1 $(LDFLAGS)
-
-# main.o: $(SRCDIR)/main.c
-# 	$(CC) $(CFLAGS) $(SRCDIR)/main.c
-
-# clean:
-# 	rm *.exe
-# 	rm *.o
-
-# Makefile for Windows
-#vpath %.c ./source
-#vpath %.h ./source
+CFLAGS = -g -I$(INCLUDE) -c 
+LDFLAGS = -lmingw32 -lSDL2main -lSDL2_image -lSDL2 -mwindows -lm -lSDL2_net 
 
 vpath %.h ./source
 vpath %.c ./source
@@ -26,19 +9,10 @@ SRCDIR=./source
 CC=gcc
 INCLUDE=C:\msys64\mingw64\include\SDL2
 
-CFLAGS=-g -I$(INCLUDE) -c -Wall -O
-
-LDFLAGS = -lSDL2main -lSDL2_image -lSDL2 -lm -lSDL2_net
-#LDFLAGS=-lmingw32 -lSDL2main -lSDL2_image -lSDL2 -mwindows -lm
-
-# Define paths to object files based on the source files
-
-# Define the final executable file
-EXECUTABLE=simpleSDLexample1
+EXECUTABLE=gswitch
 SERVER=server
 
-# Default rule
-all: $(EXECUTABLE)
+all: $(EXECUTABLE) $(SERVER)
 
 #making the server
 server: $(SRCDIR)/server.o  $(SRCDIR)/Network.o
@@ -73,8 +47,8 @@ $(SRCDIR)/Network.o: Network.c Network.h
 
 # Clean up command
 clean:
-	@echo "cleaning..."
-	rm -rf $(SRCDIR)/*.o
-	rm -f $(EXECUTABLE)
-	rm -f $(SERVER)
-	@echo "Success"
+	@echo "Cleaning..."
+	-del /Q "$(SRCDIR)\*.o"
+	-del /Q $(EXECUTABLE).exe
+	-del /Q $(SERVER).exe
+	@echo "Clean successful."
