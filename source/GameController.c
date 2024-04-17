@@ -69,16 +69,16 @@ void applyGravity(GameModel* model) {
 }
 
 void updateModel(GameModel* model) {
-    const float speed = 7.0f;
+    //const float speed = 7.0f;
     model->velocityX = model->velocityY = 0;
 
     // applyGravity(model);
 
-    if (model->up && !model->down && !model->collisionUp) model->velocityY = -speed;
-    if (model->down && !model->up && !model->collisionDown) model->velocityY = speed;
+    if (model->up && !model->down && !model->collisionUp) model->velocityY = -model->playerSpeed;
+    if (model->down && !model->up && !model->collisionDown) model->velocityY = model->playerSpeed;
 
-    if (model->left && !model->right && !model->collisionLeft) model->velocityX = -speed;
-    if (model->right && !model->left && !model->collisionRight) model->velocityX = speed; // Prevent right movement if collision on the right
+    if (model->left && !model->right && !model->collisionLeft) model->velocityX = -model->playerSpeed;
+    if (model->right && !model->left && !model->collisionRight) model->velocityX = model->playerSpeed; // Prevent right movement if collision on the right
 
     //if(check(model(x+1)))
     model->x += model->velocityX;

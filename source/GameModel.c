@@ -14,6 +14,7 @@ void initializeModel(GameModel* model) {
     model->up = model->down = model->left = model->right = false;
     model->collisionUp = model->collisionDown = model->collisionLeft = model->collisionRight = false;
     model->blockSpeed = 10;
+    model->playerSpeed = 4.0f;
     model->activeBlocks = 5; // Startar med 5 block
     model->startTime = SDL_GetTicks(); // Startar tidräknaren
 
@@ -33,11 +34,13 @@ void updateBlocks(GameModel* model, SDL_Rect shipRect) {
 
     // Uppdatera antalet aktiva block baserat på tiden
     if (elapsedTime < 12) {
-        model->activeBlocks = 5;
+        model->activeBlocks = 5;    
     } else if (elapsedTime < 25) {
-        model->activeBlocks = 15;
+        model->activeBlocks = 10;
+        //model->playerSpeed = 5.0f;
     } else {
         model->activeBlocks = 30;
+        model->playerSpeed = 8.0f;
     }
 
     handleCollision(model, shipRect, model->blockPositions, model->activeBlocks);

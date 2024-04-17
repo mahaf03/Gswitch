@@ -13,6 +13,7 @@ typedef struct {
     SDL_Rect blockPositions[30]; // Antal block du vill ha
     int blockSpeed;
     int activeBlocks; // Antal aktiva block
+    float playerSpeed;
     Uint32 startTime; // Starttid för timern
 } GameModel;
 
