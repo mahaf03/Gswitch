@@ -10,8 +10,10 @@ typedef struct {
     float velocityX, velocityY; // Player's velocity
     bool up, down, left, right; // Direction flags
     bool collisionUp, collisionDown, collisionLeft, collisionRight; // Collision flags
-    SDL_Rect blockPositions[20]; // Antal block du vill ha
+    SDL_Rect blockPositions[30]; // Antal block du vill ha
     int blockSpeed;
+    int activeBlocks; // Antal aktiva block
+    Uint32 startTime; // Starttid för timern
 } GameModel;
 
 

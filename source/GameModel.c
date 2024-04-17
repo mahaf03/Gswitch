@@ -3,55 +3,54 @@
 #include <stdlib.h> // För rand() och srand()
 #include <time.h>   // För time()
 
-// void initializeModel(GameModel* model) {
-//     model->x = 200;
-//     model->y = 200;
-//     model->velocityX = model->velocityY = 0;
-//     model->up = model->down = model->left = model->right = false;
-//     model->collisionUp = model->collisionDown = model->collisionLeft = model->collisionRight = false;
-// }
+
+
 
 void initializeModel(GameModel* model) {
-   // Initialisera slumpgeneratorn
     srand((unsigned int)time(NULL));
-
-    // Sätt spelarens initiala position och hastighet
     model->x = 200;
     model->y = 200;
     model->velocityX = model->velocityY = 0;
-
-    // Initialisera spelarkontroller
     model->up = model->down = model->left = model->right = false;
-
-    // Initialisera kollisionsstatusar
     model->collisionUp = model->collisionDown = model->collisionLeft = model->collisionRight = false;
+    model->blockSpeed = 10;
+    model->activeBlocks = 5; // Startar med 5 block
+    model->startTime = SDL_GetTicks(); // Startar tidräknaren
 
-    // Sätt hastigheten för blocken och initialisera deras positioner
-    model->blockSpeed = 10; // Ange hastigheten för blocken
-    for (int i = 0; i < 20; i++) {
-        model->blockPositions[i].x = 1200 + i * 50; // Startar till höger utanför skärmen
-        model->blockPositions[i].y = rand() % 750; // Ett slumpmässigt y-värde
+    for (int i = 0; i < 30; i++) { // Förbereder alla möjliga block
+        model->blockPositions[i].x = 1200 + i * 50;
+        model->blockPositions[i].y = rand() % 750;
         model->blockPositions[i].w = 50;
         model->blockPositions[i].h = 50;
     }
 }
 
+
+
 void updateBlocks(GameModel* model, SDL_Rect shipRect) {
-        // Hantera kollisioner för varje block
-        handleCollision(model, shipRect, model->blockPositions, 20);
-    
-    for (int i = 0; i < 20; i++) {
-        // Uppdatera x-positionen för varje block
+    Uint32 currentTime = SDL_GetTicks();
+    Uint32 elapsedTime = (currentTime - model->startTime) / 1000; // Konverterar ms till sekunder
+
+    // Uppdatera antalet aktiva block baserat på tiden
+    if (elapsedTime < 12) {
+        model->activeBlocks = 5;
+    } else if (elapsedTime < 25) {
+        model->activeBlocks = 15;
+    } else {
+        model->activeBlocks = 30;
+    }
+
+    handleCollision(model, shipRect, model->blockPositions, model->activeBlocks);
+
+    for (int i = 0; i < model->activeBlocks; i++) {
         model->blockPositions[i].x -= model->blockSpeed;
-        // Kontrollera om blocket har passerat skärmens vänstra kant
         if (model->blockPositions[i].x < -model->blockPositions[i].w) {
-            // Återställ blocket till höger utanför skärmen
             model->blockPositions[i].x = 1200;
-            // Ge det en ny y-position
             model->blockPositions[i].y = rand() % (750 - model->blockPositions[i].h);
         }
     }
 }
+
 
 int min(int a, int b) {
     return (a < b) ? a : b;
