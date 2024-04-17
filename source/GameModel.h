@@ -14,6 +14,7 @@ typedef struct {
     int blockSpeed;
     int activeBlocks; // Antal aktiva block
     float playerSpeed;
+    int playerLife; // Antal liv
     Uint32 startTime; // Starttid för timern
 } GameModel;
 

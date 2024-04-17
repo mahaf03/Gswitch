@@ -15,6 +15,7 @@ void initializeModel(GameModel* model) {
     model->collisionUp = model->collisionDown = model->collisionLeft = model->collisionRight = false;
     model->blockSpeed = 10;
     model->playerSpeed = 4.0f;
+    model->playerLife = 10;
     model->activeBlocks = 5; // Startar med 5 block
     model->startTime = SDL_GetTicks(); // Startar tidräknaren
 
@@ -86,7 +87,7 @@ void handleCollision(GameModel* model, SDL_Rect shipRect, SDL_Rect* blockPositio
     for (int i = 0; i < numBlocks; i++) {
         if (checkCollision(&shipRect, &blockPositions[i])) {
             collisionDetected = true;
-
+            model->playerLife--;
             // Hantera kollision genom att stoppa spelarens rörelse eller justera position
             // Exempel: Stoppa spelaren från att röra sig in i blocket
             if (shipRect.y < blockPositions[i].y) {

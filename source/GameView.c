@@ -5,6 +5,16 @@
 #include "GameController.h"
 #include "GameModel.h"
 
+void drawLives(SDL_Renderer* renderer, int lives, int x, int y) {
+    int barWidth = 15;
+    SDL_Color color = {0, 255, 255}; // blå färg för livsindikatorn
+    for (int i = 0; i < lives; i++) {
+        SDL_Rect rect = {x + i * (barWidth + 5), y, barWidth, 20};
+        SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, 255);
+        SDL_RenderFillRect(renderer, &rect);
+    }
+}
+
 void initView(SDL_Renderer** renderer, SDL_Window** window, SDL_Texture** texture, SDL_Texture** backgroundTexture ,SDL_Texture** blockTexture) {
     *window = SDL_CreateWindow("GSwitch", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1200, 686, 0);
     *renderer = SDL_CreateRenderer(*window, -1, SDL_RENDERER_ACCELERATED);
@@ -45,6 +55,8 @@ void loadBlock(SDL_Renderer* renderer, SDL_Texture** blockTexture) {
 void renderView(SDL_Renderer* renderer, SDL_Texture* shipTexture, SDL_Texture* backgroundTexture, SDL_Texture* blockTexture, GameModel* model, SDL_Rect shipRect) {
     SDL_RenderClear(renderer);
 
+
+
     // Antag att dessa är dina blockpositioner
     // SDL_Rect blockPositions[] = { Gammla blocken
     //     {0, 0, 50, 50}, {50, 0, 50, 50}, // Övre vänstra hörnet
@@ -64,8 +76,9 @@ void renderView(SDL_Renderer* renderer, SDL_Texture* shipTexture, SDL_Texture* b
 
     // Rendera skeppet
     // SDL_Rect shipRect = { (int)model->x, (int)model->y, 50, 50 };
-    SDL_RenderCopy(renderer, shipTexture, NULL, &shipRect);
-
+    if(model->playerLife > 0){
+        SDL_RenderCopy(renderer, shipTexture, NULL, &shipRect);
+    }
 
 //    handleCollision(model, shipRect, blockPositions, numBlocks, renderer, blockTexture); Gammla kollision med gamla blocken
 
@@ -77,6 +90,9 @@ void renderView(SDL_Renderer* renderer, SDL_Texture* shipTexture, SDL_Texture* b
     for (int i = 0; i < 20; i++) {
         placeTile(renderer, blockTexture, model->blockPositions[i].x, model->blockPositions[i].y);
     }
+
+    drawLives(renderer, model->playerLife, 10, 30);
+
 
     SDL_RenderPresent(renderer);
 }
