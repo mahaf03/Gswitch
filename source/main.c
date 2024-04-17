@@ -1,5 +1,7 @@
 //main.c
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_mixer.h>
+#include <stdbool.h>
 #include "GameModel.h"
 #include "GameView.h"
 #include "GameController.h"
@@ -15,7 +17,22 @@ int main(int argv, char** args) {
 
     GameModel model;
     initializeModel(&model);
-    
+
+    bool success = true;
+    if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0) {
+        printf("SDL_mixer could not initialize! SDL_mixer Error: %s\n", Mix_GetError());
+        success = false;
+    }
+
+    Mix_Music *backgroundMusic = Mix_LoadMUS("resources/music.mp3");
+    if (backgroundMusic == NULL) {
+        printf("Failed to load background music! SDL_mixer Error: %s\n", Mix_GetError());
+        success = false;
+    }
+
+    // Spela musik
+    Mix_PlayMusic(backgroundMusic, -1); // Sista argumentet är antalet repetitioner (-1 för oändlig loop)
+
     initView(&renderer, &window, &texture, &bgTexture, &blockTexture);
 
     const int FPS = 60;
@@ -49,6 +66,11 @@ int main(int argv, char** args) {
             SDL_Delay(frameDelay - frameTime);
         }
     }
+
+    Mix_FreeMusic(backgroundMusic); // För musik
+    backgroundMusic = NULL;
+
+    Mix_CloseAudio(); // Vid avslutning av programmet
 
     closeView(renderer, window, texture, bgTexture, blockTexture);
     SDL_Quit();

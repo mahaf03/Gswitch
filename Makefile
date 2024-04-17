@@ -81,7 +81,7 @@ CC=gcc
 INCLUDE=C:\msys64\mingw64\include\SDL2
 
 CFLAGS=-g -I$(INCLUDE)
-LDFLAGS=-lmingw32 -lSDL2main -lSDL2_image -lSDL2 -mwindows -lm
+LDFLAGS=-lmingw32 -lSDL2main -lSDL2_image -lSDL2 -mwindows -lm -lSDL2_mixer
 
 # Define object files
 OBJS=$(SRCDIR)/main.o $(SRCDIR)/GameModel.o $(SRCDIR)/GameView.o $(SRCDIR)/GameController.o
