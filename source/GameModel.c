@@ -105,6 +105,7 @@ void handleCollision(GameModel* model, SDL_Rect shipRect, SDL_Rect* blockPositio
                 // Kollision till vänster
                 model->x = blockPositions[i].x + blockPositions[i].w;
             }
+            
         }
     }
 
