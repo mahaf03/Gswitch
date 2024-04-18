@@ -4,64 +4,31 @@
 #include <stdbool.h>
 #include "GameController.h"
 #include "GameModel.h"
-void menuView(SDL_Renderer **renderer, SDL_Window **window, SDL_Texture **backgroundTexture, SDL_Texture **continueTexture, SDL_Texture **exitTexture)
+void menuView(SDL_Renderer **renderer, SDL_Window **window, SDL_Texture **backgroundTexture, SDL_Texture **continueTexture, SDL_Texture **exitTexture, SDL_Texture **volumeTexture)
 {
     SDL_Surface *surface = IMG_Load("resources/background.png");
-    if (!surface)
-    {
-        printf("Unable to load background image: %s\n", IMG_GetError());
-        *backgroundTexture = NULL;
-        return;
-    }
     *backgroundTexture = SDL_CreateTextureFromSurface(*renderer, surface);
     SDL_FreeSurface(surface);
 
-    // Load "Continue" button image
     SDL_Surface *continueSurface = IMG_Load("resources/continue.png");
-    if (!continueSurface)
-    {
-        printf("Unable to load continue button image: %s\n", IMG_GetError());
-        *continueTexture = NULL;
-    }
-    else
-    {
-        *continueTexture = SDL_CreateTextureFromSurface(*renderer, continueSurface);
-        SDL_FreeSurface(continueSurface);
-    }
+    *continueTexture = SDL_CreateTextureFromSurface(*renderer, continueSurface);
+    SDL_FreeSurface(continueSurface);
 
     SDL_Surface *exitSurface = IMG_Load("resources/exit.png");
-    if (!exitSurface)
-    {
-        printf("Unable to load exit button image: %s\n", IMG_GetError());
-        *exitTexture = NULL;
-    }
-    else
-    {
-        *exitTexture = SDL_CreateTextureFromSurface(*renderer, exitSurface);
-        SDL_FreeSurface(exitSurface);
-    }
+    *exitTexture = SDL_CreateTextureFromSurface(*renderer, exitSurface);
+    SDL_FreeSurface(exitSurface);
+
+    SDL_Surface *volumeSurface = IMG_Load("resources/mute.png");
+    *volumeTexture = SDL_CreateTextureFromSurface(*renderer, volumeSurface);
+    SDL_FreeSurface(volumeSurface); // Korrekt frigör ytan
 }
-void renderMenu(SDL_Renderer **renderer, SDL_Window **window, SDL_Texture **backgroundTexture, SDL_Texture **continueTexture, SDL_Texture **exitTexture, SDL_Rect continueButtonRect, SDL_Rect exitButtonRect)
+void renderMenu(SDL_Renderer **renderer, SDL_Window **window, SDL_Texture **backgroundTexture, SDL_Texture **continueTexture, SDL_Texture **exitTexture, SDL_Rect continueButtonRect, SDL_Rect exitButtonRect, SDL_Rect volumeButtonRect, SDL_Texture **volumeTexture)
 {
     SDL_RenderClear(*renderer);
-
-    // Render the background
-    if (*backgroundTexture)
-    {
-        SDL_RenderCopy(*renderer, *backgroundTexture, NULL, NULL);
-    }
-
-    // Render the "Continue" button
-    if (*continueTexture)
-    {
-        SDL_RenderCopy(*renderer, *continueTexture, NULL, &continueButtonRect);
-    }
-
-    // Render the "Exit" button
-    if (*exitTexture)
-    {
-        SDL_RenderCopy(*renderer, *exitTexture, NULL, &exitButtonRect);
-    }
+    SDL_RenderCopy(*renderer, *backgroundTexture, NULL, NULL);
+    SDL_RenderCopy(*renderer, *volumeTexture, NULL, &volumeButtonRect);
+    SDL_RenderCopy(*renderer, *continueTexture, NULL, &continueButtonRect);
+    SDL_RenderCopy(*renderer, *exitTexture, NULL, &exitButtonRect);
     SDL_RenderPresent(*renderer);
 }
 
