@@ -13,11 +13,13 @@ void initializeModel(GameModel* model) {
     model->velocityX = model->velocityY = 0;
     model->up = model->down = model->left = model->right = false;
     model->collisionUp = model->collisionDown = model->collisionLeft = model->collisionRight = false;
-    model->blockSpeed = 10;
+    model->blockSpeed = 5;
     model->playerSpeed = 4.0f;
-    model->playerLife = 10;
+    model->playerLife = 5;
     model->activeBlocks = 5; // Startar med 5 block
     model->startTime = SDL_GetTicks(); // Startar tidräknaren
+    model->isImmortal = false;  // Initially not immortal
+    model->immortalStartTime = 0;  // Reset time
 
     for (int i = 0; i < 30; i++) { // Förbereder alla möjliga block
         model->blockPositions[i].x = 1200 + i * 50;
@@ -38,10 +40,12 @@ void updateBlocks(GameModel* model, SDL_Rect shipRect) {
         model->activeBlocks = 5;    
     } else if (elapsedTime < 25) {
         model->activeBlocks = 10;
-        //model->playerSpeed = 5.0f;
+        model->playerSpeed = 5.0f;
+        model->blockSpeed = 8;
     } else {
-        model->activeBlocks = 30;
+        model->activeBlocks = 20;
         model->playerSpeed = 8.0f;
+        model->blockSpeed = 10;
     }
 
     handleCollision(model, shipRect, model->blockPositions, model->activeBlocks);
@@ -86,24 +90,39 @@ void handleCollision(GameModel* model, SDL_Rect shipRect, SDL_Rect* blockPositio
 
     for (int i = 0; i < numBlocks; i++) {
         if (checkCollision(&shipRect, &blockPositions[i])) {
-            collisionDetected = true;
-            model->playerLife--;
+            if (!model->isImmortal) {  // Only process collision if not immortal
+                model->playerLife--; // Decrease life
+                if (model->playerLife == 0) {
+                    printf("Game Over\n");
+                    exit(0);
+                }
+                
+                // Set the player to be immortal for 2 seconds
+                model->isImmortal = true;
+                model->immortalStartTime = SDL_GetTicks();
+            }
+
+
             // Hantera kollision genom att stoppa spelarens rörelse eller justera position
             // Exempel: Stoppa spelaren från att röra sig in i blocket
             if (shipRect.y < blockPositions[i].y) {
                 // Kollision underifrån
                 model->y = blockPositions[i].y - shipRect.h;
+                model->collisionDown = true;
             } else if (shipRect.y > blockPositions[i].y) {
                 // Kollision ovanifrån
                 model->y = blockPositions[i].y + blockPositions[i].h;
+                model->collisionUp = true;
             }
 
             if (shipRect.x < blockPositions[i].x) {
                 // Kollision till höger
                 model->x = blockPositions[i].x - shipRect.w;
+                model->collisionRight = true;
             } else if (shipRect.x > blockPositions[i].x) {
                 // Kollision till vänster
                 model->x = blockPositions[i].x + blockPositions[i].w;
+                model->collisionLeft = true;
             }
             
         }
@@ -115,6 +134,15 @@ void handleCollision(GameModel* model, SDL_Rect shipRect, SDL_Rect* blockPositio
         model->collisionUp = false;
         model->collisionDown = false;
     }
+}
+
+void updateGameState(GameModel* model) {
+    Uint32 currentTime = SDL_GetTicks();
+    if (model->isImmortal && (currentTime - model->immortalStartTime >= 3000)) {
+        model->isImmortal = false;  // End immortality
+    }
+
+    // Continue with other game updates
 }
 
 
