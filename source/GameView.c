@@ -89,3 +89,4 @@ void drawLives(SDL_Renderer* renderer, int lives, int x, int y) {
 }
 
 
+

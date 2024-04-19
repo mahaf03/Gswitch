@@ -57,6 +57,7 @@ int main(int argv, char** args) {
 
         updateModel(&model);
         updateBlocks(&model,shipRect); // Lägg till denna rad för att uppdatera blocken
+        updateGameState(&model);
 
         renderView(renderer, texture, bgTexture, blockTexture, &model,shipRect);
         
