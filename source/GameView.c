@@ -18,7 +18,7 @@ void menuView(SDL_Renderer **renderer, SDL_Window **window, SDL_Texture **backgr
     *exitTexture = SDL_CreateTextureFromSurface(*renderer, exitSurface);
     SDL_FreeSurface(exitSurface);
 
-    SDL_Surface *volumeSurface = IMG_Load("resources/mute.png");
+    SDL_Surface *volumeSurface = IMG_Load("resources/unmute.png");
     *volumeTexture = SDL_CreateTextureFromSurface(*renderer, volumeSurface);
     SDL_FreeSurface(volumeSurface); // Korrekt frigör ytan
 }

@@ -8,11 +8,12 @@
 typedef enum
 {
     Menu,
-    Game, 
+    Game,
     MusicOn,
     MusicOff
 
 } GameState;
+
 int main(int argv, char **args)
 {
     SDL_Init(SDL_INIT_VIDEO);
@@ -32,7 +33,8 @@ int main(int argv, char **args)
 
     SDL_Rect continueButtonRect = {470, 100, 200, 200}; // Centrerad position och storlek för "Continue" knappen
     SDL_Rect exitButtonRect = {500, 250, 150, 200};
-    SDL_Rect volumeButtonRect = {500, 430, 150, 150}; // Positionerad under "Continue" knappen med 50 pixels mellanrum
+    SDL_Rect volumeButtonRect = {500, 430, 150, 150};
+    SDL_Rect MuteButtonRect = {500, 430, 150, 150}; // Positionerad under "Continue" knappen med 50 pixels mellanrum
 
     initializeModel(&model);
 

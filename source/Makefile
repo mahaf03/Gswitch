@@ -61,7 +61,7 @@ FRAMEWORKS=  # Assuming no specific frameworks needed beyond what SDL2 requires
 OBJS=GameController.o GameModel.o GameView.o main.o
 
 # Target executable
-TARGET=game_app
+TARGET=GSwitch
 
 # Default rule
 all: $(TARGET)
