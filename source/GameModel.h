@@ -14,7 +14,10 @@ typedef struct {
     int blockSpeed;
     int activeBlocks; // Antal aktiva block
     float playerSpeed;
+    int playerLife; // Antal liv
     Uint32 startTime; // Starttid för timern
+    bool isImmortal;
+    Uint32 immortalStartTime;
 } GameModel;
 
 
@@ -23,4 +26,7 @@ int min(int a, int b);
 int checkCollision(SDL_Rect *shipRect, SDL_Rect *blockRect);
 void handleCollision(GameModel* model, SDL_Rect shipRect, SDL_Rect* blockPositions, int numBlocks);
 void updateBlocks(GameModel* model, SDL_Rect shipRect);
+void updateGameState(GameModel* model);
+void updateCharacterPosition(GameModel* model);
+
 #endif

@@ -16,5 +16,5 @@ void closeView(SDL_Renderer *renderer, SDL_Window *window, SDL_Texture *shipText
 void loadBackground(SDL_Renderer *renderer, SDL_Texture **backgroundTexture);
 void loadBlock(SDL_Renderer *renderer, SDL_Texture **blockTexture);
 void placeTile(SDL_Renderer *renderer, SDL_Texture *texture, int x, int y);
-
+void drawLives(SDL_Renderer* renderer, int lives, int x, int y);
 #endif

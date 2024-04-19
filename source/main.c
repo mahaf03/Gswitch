@@ -136,10 +136,12 @@ int main(int argv, char **args)
             SDL_Rect shipRect = {(int)model.x, (int)model.y, 50, 50};
             updateModel(&model);
             updateBlocks(&model, shipRect);
+            updateGameState(&model); // deras
             renderView(renderer, texture, bgTexture, blockTexture, &model, shipRect);
         }
 
-        frameTime = SDL_GetTicks() - frameStart;
+        frameTime = SDL_GetTicks() - frameStart; // Hur länge det tog att processa ramen
+
         if (frameDelay > frameTime)
         {
             SDL_Delay(frameDelay - frameTime);
