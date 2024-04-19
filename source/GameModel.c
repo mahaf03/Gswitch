@@ -13,7 +13,7 @@ void initializeModel(GameModel* model) {
     model->velocityX = model->velocityY = 0;
     model->up = model->down = model->left = model->right = false;
     model->collisionUp = model->collisionDown = model->collisionLeft = model->collisionRight = false;
-    model->blockSpeed = 10;
+    model->blockSpeed = 5;
     model->playerSpeed = 4.0f;
     model->activeBlocks = 5; // Startar med 5 block
     model->startTime = SDL_GetTicks(); // Startar tidräknaren
@@ -37,10 +37,12 @@ void updateBlocks(GameModel* model, SDL_Rect shipRect) {
         model->activeBlocks = 5;    
     } else if (elapsedTime < 25) {
         model->activeBlocks = 10;
-        //model->playerSpeed = 5.0f;
+        model->playerSpeed = 5.0f;
+        model->blockSpeed = 8;
     } else {
-        model->activeBlocks = 30;
+        model->activeBlocks = 20;
         model->playerSpeed = 8.0f;
+        model->blockSpeed = 10;
     }
 
     handleCollision(model, shipRect, model->blockPositions, model->activeBlocks);
@@ -92,17 +94,21 @@ void handleCollision(GameModel* model, SDL_Rect shipRect, SDL_Rect* blockPositio
             if (shipRect.y < blockPositions[i].y) {
                 // Kollision underifrån
                 model->y = blockPositions[i].y - shipRect.h;
+                model->collisionDown = true;
             } else if (shipRect.y > blockPositions[i].y) {
                 // Kollision ovanifrån
                 model->y = blockPositions[i].y + blockPositions[i].h;
+                model->collisionUp = true;
             }
 
             if (shipRect.x < blockPositions[i].x) {
                 // Kollision till höger
                 model->x = blockPositions[i].x - shipRect.w;
+                model->collisionRight = true;
             } else if (shipRect.x > blockPositions[i].x) {
                 // Kollision till vänster
                 model->x = blockPositions[i].x + blockPositions[i].w;
+                model->collisionLeft = true;
             }
             
         }
