@@ -3,6 +3,10 @@
 #include <stdlib.h> // För rand() och srand()
 #include <time.h>   // För time()
 
+#define WINDOW_WIDTH 1200
+#define WINDOW_HEIGHT 750
+#define SHIP_WIDTH 50
+#define SHIP_HEIGHT 50
 
 
 
@@ -137,6 +141,7 @@ void handleCollision(GameModel* model, SDL_Rect shipRect, SDL_Rect* blockPositio
 }
 
 void updateGameState(GameModel* model) {
+    updateCharacterPosition(model);
     Uint32 currentTime = SDL_GetTicks();
     if (model->isImmortal && (currentTime - model->immortalStartTime >= 3000)) {
         model->isImmortal = false;  // End immortality
@@ -145,4 +150,26 @@ void updateGameState(GameModel* model) {
     // Continue with other game updates
 }
 
+void updateCharacterPosition(GameModel* model) {
+    // Update position based on velocity
+    model->x += model->velocityX;
+    model->y += model->velocityY;
+
+    // Clamp position to stay within the window
+    if (model->x < 0) {
+        model->x = 0;
+        model->collisionLeft = true;  // Optional: Set collision flag if needed
+    } else if (model->x > WINDOW_WIDTH - SHIP_WIDTH) {
+        model->x = WINDOW_WIDTH - SHIP_WIDTH;
+        model->collisionRight = true;  // Optional: Set collision flag if needed
+    }
+
+    if (model->y < 0) {
+        model->y = 0;
+        model->collisionUp = true;  // Optional: Set collision flag if needed
+    } else if (model->y > WINDOW_HEIGHT - SHIP_HEIGHT - SHIP_HEIGHT) {
+        model->y = WINDOW_HEIGHT - SHIP_HEIGHT - SHIP_HEIGHT;
+        model->collisionDown = true;  // Optional: Set collision flag if needed
+    }
+}
 

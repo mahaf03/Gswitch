@@ -27,5 +27,6 @@ int checkCollision(SDL_Rect *shipRect, SDL_Rect *blockRect);
 void handleCollision(GameModel* model, SDL_Rect shipRect, SDL_Rect* blockPositions, int numBlocks);
 void updateBlocks(GameModel* model, SDL_Rect shipRect);
 void updateGameState(GameModel* model);
+void updateCharacterPosition(GameModel* model);
 
 #endif
