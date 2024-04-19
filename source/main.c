@@ -59,6 +59,7 @@ int main(int argv, char** args) {
         updateBlocks(&model,shipRect); // Lägg till denna rad för att uppdatera blocken
 
         renderView(renderer, texture, bgTexture, blockTexture, &model,shipRect);
+        
 
         frameTime = SDL_GetTicks() - frameStart; // Hur länge det tog att processa ramen
 
