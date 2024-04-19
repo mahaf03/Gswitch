@@ -91,8 +91,10 @@ int checkCollision(SDL_Rect* a, SDL_Rect* b) {
 
 void handleCollision(GameModel* model, SDL_Rect shipRect, SDL_Rect* blockPositions, int numBlocks) {
     bool collisionDetected = false;
-
-    for (int i = 0; i < numBlocks; i++) {
+    
+    if(!model->isImmortal) {
+        // Skip collision detection if immortal
+        for (int i = 0; i < numBlocks; i++) {
         if (checkCollision(&shipRect, &blockPositions[i])) {
             if (!model->isImmortal) {  // Only process collision if not immortal
                 model->playerLife--; // Decrease life
@@ -130,6 +132,8 @@ void handleCollision(GameModel* model, SDL_Rect shipRect, SDL_Rect* blockPositio
             }
             
         }
+    }
+    
     }
 
     if (!collisionDetected) {
