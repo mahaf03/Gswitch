@@ -5,6 +5,8 @@
 #include "GameModel.h"
 #include "GameView.h"
 #include "GameController.h"
+#include "Network.h"
+
 typedef enum
 {
     Menu,
@@ -27,6 +29,7 @@ int main(int argv, char **args)
     SDL_Texture *exitTexture = NULL;
     SDL_Texture *volumeTexture = NULL;
     SDL_Texture *muteVolume = NULL;
+
     GameModel model;
     window = SDL_CreateWindow("GSwitch", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1200, 686, 0);
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
@@ -59,13 +62,38 @@ int main(int argv, char **args)
 
     const int FPS = 60;
     const int frameDelay = 1000 / FPS; // Tiden varje frame bör ta
-
     Uint32 frameStart;
     int frameTime;
+    GameModel models[4];
+    int playercount = 0;
+    for (int i = 0; i < 4; i++)
+    {
+        initializeModel(&models[i]);
+    }
+    // Du måste också passera en pekare till bakgrundstexturen till initView
+    // initView(&renderer, &window, &texture, &bgTexture);
+    printf("initializing network... \n");
+    UDPsocket sd;
+    IPaddress srvadd;
+    UDPpacket *pReceive;
+    UDPpacket *p;
+    initNetwork_Client(&sd, &srvadd, pReceive);
+    printf("Network initialized!\n");
+    // Allocate memory for UDP packets
+    if (!(p = SDLNet_AllocPacket(512)))
+    {
+        fprintf(stderr, "SDLNet_AllocPacket: %s\n", SDLNet_GetError());
+        exit(EXIT_FAILURE);
+    }
+    if (!((pReceive = SDLNet_AllocPacket(512))))
+    {
+        fprintf(stderr, "SDLNet_AllocPacket: %s\n", SDLNet_GetError());
+        exit(EXIT_FAILURE);
+    }
 
     bool closeWindow = false;
     GameState currentState = Menu;
-    GameState currentMusicSatate = MusicOn;
+    GameState currentMusicState = MusicOn;
 
     while (!closeWindow)
     {
@@ -80,19 +108,15 @@ int main(int argv, char **args)
             }
             else if (event.type == SDL_MOUSEBUTTONDOWN)
             {
-                // Kontrollera om användaren klickar på "Continue"
                 int mouseX, mouseY;
                 SDL_GetMouseState(&mouseX, &mouseY);
                 if (currentState == Menu)
                 {
-
-                    if (
-
-                        mouseX >= continueButtonRect.x && mouseX <= continueButtonRect.x + continueButtonRect.w &&
+                    if (mouseX >= continueButtonRect.x && mouseX <= continueButtonRect.x + continueButtonRect.w &&
                         mouseY >= continueButtonRect.y && mouseY <= continueButtonRect.y + continueButtonRect.h)
                     {
-                        printf("Pressed contniue button\n");
-                        currentState = Game; // Ändra tillstånd till Game
+                        printf("Pressed continue button\n");
+                        currentState = Game;
                     }
                     else if (mouseX >= exitButtonRect.x && mouseX <= exitButtonRect.x + exitButtonRect.w &&
                              mouseY >= exitButtonRect.y && mouseY <= exitButtonRect.y + exitButtonRect.h)
@@ -103,15 +127,15 @@ int main(int argv, char **args)
                     else if (mouseX >= volumeButtonRect.x && mouseX <= volumeButtonRect.x + volumeButtonRect.w &&
                              mouseY >= volumeButtonRect.y && mouseY <= volumeButtonRect.y + volumeButtonRect.h)
                     {
-                        if (currentMusicSatate == MusicOn)
+                        if (currentMusicState == MusicOn)
                         {
                             Mix_PauseMusic();
-                            currentMusicSatate = MusicOff;
+                            currentMusicState = MusicOff;
                         }
                         else
                         {
                             Mix_ResumeMusic();
-                            currentMusicSatate = MusicOn;
+                            currentMusicState = MusicOn;
                         }
                     }
                 }
@@ -119,9 +143,14 @@ int main(int argv, char **args)
             if (currentState == Game)
             {
                 handleEvent(&event, &model, &closeWindow);
+                udpDataToServer testdata = {model.x, model.y, 0};
+                if (model.x >= 400.f)
+                {
+                    testdata.status = 3;
+                }
+                clientSendPacket(testdata, &srvadd, &sd);
             }
         }
-
         if (currentState == Menu)
         {
             // Rendera menyn
@@ -136,11 +165,31 @@ int main(int argv, char **args)
             SDL_Rect shipRect = {(int)model.x, (int)model.y, 50, 50};
             updateModel(&model);
             updateBlocks(&model, shipRect);
-            updateGameState(&model); // deras
+            updateGameState(&model);
             renderView(renderer, texture, bgTexture, blockTexture, &model, shipRect);
         }
 
         frameTime = SDL_GetTicks() - frameStart; // Hur länge det tog att processa ramen
+
+        udpDataToClient message;
+        IPaddress addrr = clientReceivePacket(&message, &sd);
+        if (addrr.host != 0 && addrr.port != 0)
+        {
+            printf("new message from %x:\n", addrr.host);
+            playercount = message.playercount;
+            for (int i = 0; i < message.playercount; i++)
+            {
+                printf("\tplayer %d at %f %f\n", i, message.playerPositions[i].x, message.playerPositions[i].y);
+                models[i].x = message.playerPositions[i].x;
+                models[i].y = message.playerPositions[i].y;
+            }
+        }
+        for (int i = 0; i < playercount; i++)
+        {
+            models[i].x = message.playerPositions[i].x;
+            models[i].y = message.playerPositions[i].y;
+            updateModel(&models[i]);
+        }
 
         if (frameDelay > frameTime)
         {
