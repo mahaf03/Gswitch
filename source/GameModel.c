@@ -12,8 +12,8 @@
 
 void initializeModel(GameModel* model) {
     srand((unsigned int)time(NULL));
-    model->x = 200;
-    model->y = 200;
+    model->x = 400;
+    model->y = 350;
     model->velocityX = model->velocityY = 0;
     model->up = model->down = model->left = model->right = false;
     model->collisionUp = model->collisionDown = model->collisionLeft = model->collisionRight = false;
@@ -169,10 +169,10 @@ void updateCharacterPosition(GameModel* model) {
     }
 
     if (model->y < 0) {
-        model->y = 0;
+        model->y = WINDOW_HEIGHT - SHIP_HEIGHT - SHIP_HEIGHT;
         model->collisionUp = true;  // Optional: Set collision flag if needed
     } else if (model->y > WINDOW_HEIGHT - SHIP_HEIGHT - SHIP_HEIGHT) {
-        model->y = WINDOW_HEIGHT - SHIP_HEIGHT - SHIP_HEIGHT;
+        model->y = 0;
         model->collisionDown = true;  // Optional: Set collision flag if needed
     }
 }
