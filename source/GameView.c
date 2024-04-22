@@ -68,6 +68,11 @@ void renderView(SDL_Renderer* renderer, SDL_Texture* shipTexture, SDL_Texture* b
         placeTile(renderer, blockTexture, model->blockPositions[i].x, model->blockPositions[i].y);
         drawLives(renderer, model->playerLife, 10, 10); // Visa rektanglar som liv nedanför texten
     }
+
+    if (model->lifeActive){
+        drawExtraLife(renderer, model->lifePosX,model->lifePosY);
+    }
+    
     
 
 
@@ -88,6 +93,16 @@ void placeTile(SDL_Renderer* renderer, SDL_Texture* texture, int x, int y) {
     SDL_RenderCopy(renderer, texture, NULL, &tileRect);
 }
 
-
+void drawExtraLife(SDL_Renderer* renderer, int x, int y) {
+    int barWidth = 15;
+    SDL_Color color = {255, 0, 0};
+    printf("x: %d, y: %d\n", x, y);
+    SDL_Rect rect = {x, y, barWidth, 20};
+    //SDL_Rect rect = {20, 20, 20, 20};
+    SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, 255);
+    SDL_RenderFillRect(renderer, &rect);
+    printf("Extra life\n");
+    
+}
 
 

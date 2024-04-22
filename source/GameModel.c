@@ -22,6 +22,10 @@ void initializeModel(GameModel* model) {
     model->playerLife = 5;
     model->activeBlocks = 5; // Startar med 5 block
     model->startTime = SDL_GetTicks(); // Startar tidräknaren
+    model->lifeSpawnTime = SDL_GetTicks();
+    model->lifeActive = false;
+    model->lifePosX = 0;
+    model->lifePosY = 0;
     model->isImmortal = false;  // Initially not immortal
     model->immortalStartTime = 0;  // Reset time
 
@@ -150,6 +154,18 @@ void updateGameState(GameModel* model) {
     if (model->isImmortal && (currentTime - model->immortalStartTime >= 3000)) {
         model->isImmortal = false;  // End immortality
     }
+    // printa meddelande varje 4 sekunder
+
+    if(currentTime - model->lifeSpawnTime >= 4000){//ändra pos för life på interval
+        model->lifeActive = true;
+        model->lifePosX = rand() % WINDOW_WIDTH;
+        model->lifePosY = rand() % WINDOW_HEIGHT;
+        model->lifeSpawnTime = currentTime; 
+    }
+
+    
+    //Todo gör lifeActive till flase om spelaren kolliderar med den
+
 
     // Continue with other game updates
 }

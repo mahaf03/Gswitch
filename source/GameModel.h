@@ -12,10 +12,14 @@ typedef struct {
     bool collisionUp, collisionDown, collisionLeft, collisionRight; // Collision flags
     SDL_Rect blockPositions[30]; // Antal block du vill ha
     int blockSpeed;
-    int activeBlocks; // Antal aktiva block
+    int activeBlocks; 
     float playerSpeed;
-    int playerLife; // Antal liv
-    Uint32 startTime; // Starttid för timern
+    int playerLife; 
+    Uint32 startTime;
+    Uint32 lifeSpawnTime;
+    int lifePosX;
+    int lifePosY;
+    bool lifeActive;
     bool isImmortal;
     Uint32 immortalStartTime;
 } GameModel;
