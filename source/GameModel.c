@@ -12,8 +12,8 @@
 
 void initializeModel(GameModel* model) {
     srand((unsigned int)time(NULL));
-    model->x = 200;
-    model->y = 200;
+    model->x = 400;
+    model->y = 350;
     model->velocityX = model->velocityY = 0;
     model->up = model->down = model->left = model->right = false;
     model->collisionUp = model->collisionDown = model->collisionLeft = model->collisionRight = false;
@@ -22,6 +22,10 @@ void initializeModel(GameModel* model) {
     model->playerLife = 5;
     model->activeBlocks = 5; // Startar med 5 block
     model->startTime = SDL_GetTicks(); // Startar tidräknaren
+    model->lifeSpawnTime = SDL_GetTicks();
+    model->lifeActive = false;
+    model->lifePosX = 0;
+    model->lifePosY = 0;
     model->isImmortal = false;  // Initially not immortal
     model->immortalStartTime = 0;  // Reset time
 
@@ -91,8 +95,10 @@ int checkCollision(SDL_Rect* a, SDL_Rect* b) {
 
 void handleCollision(GameModel* model, SDL_Rect shipRect, SDL_Rect* blockPositions, int numBlocks) {
     bool collisionDetected = false;
-
-    for (int i = 0; i < numBlocks; i++) {
+    
+    if(!model->isImmortal) {
+        // Skip collision detection if immortal
+        for (int i = 0; i < numBlocks; i++) {
         if (checkCollision(&shipRect, &blockPositions[i])) {
             if (!model->isImmortal) {  // Only process collision if not immortal
                 model->playerLife--; // Decrease life
@@ -131,6 +137,8 @@ void handleCollision(GameModel* model, SDL_Rect shipRect, SDL_Rect* blockPositio
             
         }
     }
+    
+    }
 
     if (!collisionDetected) {
         model->collisionRight = false;
@@ -146,6 +154,18 @@ void updateGameState(GameModel* model) {
     if (model->isImmortal && (currentTime - model->immortalStartTime >= 3000)) {
         model->isImmortal = false;  // End immortality
     }
+    // printa meddelande varje 4 sekunder
+
+    if(currentTime - model->lifeSpawnTime >= 4000){//ändra pos för life på interval
+        model->lifeActive = true;
+        model->lifePosX = rand() % WINDOW_WIDTH;
+        model->lifePosY = rand() % WINDOW_HEIGHT;
+        model->lifeSpawnTime = currentTime; 
+    }
+
+    
+    //Todo gör lifeActive till flase om spelaren kolliderar med den
+
 
     // Continue with other game updates
 }
@@ -165,10 +185,10 @@ void updateCharacterPosition(GameModel* model) {
     }
 
     if (model->y < 0) {
-        model->y = 0;
+        model->y = WINDOW_HEIGHT - SHIP_HEIGHT - SHIP_HEIGHT;
         model->collisionUp = true;  // Optional: Set collision flag if needed
     } else if (model->y > WINDOW_HEIGHT - SHIP_HEIGHT - SHIP_HEIGHT) {
-        model->y = WINDOW_HEIGHT - SHIP_HEIGHT - SHIP_HEIGHT;
+        model->y = 0;
         model->collisionDown = true;  // Optional: Set collision flag if needed
     }
 }
