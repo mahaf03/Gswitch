@@ -33,34 +33,45 @@ int main(int argc, char **argv)
     host = serverReceivePacket(&message, &sd);
     if (host.host != 0 && host.port != 0)
     {
-      int playerNo = 0;
+      int playerNo = -1;
       for (int i = 0; i < 4; i++)
       {
         if ((players[i].host == 0 && players[i].port == 0) || (host.host == players[i].host && host.port == players[i].port))
         {
-          if (players[i].host == 0)
+          if (players[i].host == 0 && players[i].port == 0)
           {
             dataSend.playercount++;
             printf("Player %d connected! \n \t %x \n \t %d\n", i + 1, host.host, host.port);
           }
           players[i] = host;
-          playerNo = i + 1;
+          playerNo = i;
           break;
         }
       }
-      printf("New packet received from Player %d at %x !\n\t %f %f %d \n", playerNo, host.host, message.xPos, message.yPos, message.status);
-      struct PlayerPos position = {message.xPos, message.yPos};
-      dataSend.playerPositions[playerNo - 1] = position;
-      if (message.status == 3)
+
+      if (playerNo != -1) // Kollar ifall en spelar har anslutit sig/uppdaterat sin position
       {
-        quit = 1;
-      }
-      for (int i = 0; i < dataSend.playercount; i++)
-      {
-        serverSendPacket(dataSend, &players[i], &sd);
+        printf("New packet received from Player %d at %x !\n\t %f %f %d \n", playerNo + 1, host.host, message.xPos, message.yPos, message.status);
+        struct PlayerPos position = {message.xPos, message.yPos};
+        dataSend.playerPositions[playerNo] = position;
+
+        // Kollar ifall spelaren har disconnectat
+        if (message.status == 3)
+        {
+          quit = 1;
+        }
+
+        // Skickar tillbaka uppdaterad data till alla anslutna spelare
+        for (int i = 0; i < dataSend.playercount; i++)
+        {
+          if (players[i].host != 0) // Kollar så att det bara skickas till anslutna spelare
+          {
+            serverSendPacket(dataSend, &players[i], &sd);
+          }
+        }
       }
     }
-    
+
     const int FPS = 60;
     const int frameDelay = 1000 / FPS; // Tiden varje frame bör ta
 
