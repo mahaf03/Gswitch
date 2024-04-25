@@ -145,10 +145,6 @@ int main(int argv, char **args)
             {
                 handleEvent(&event, &model, &closeWindow);
                 udpDataToServer testdata = {model.x, model.y, 0};
-                if (model.x >= 400.f)
-                {
-                    testdata.status = 3;
-                }
                 clientSendPacket(testdata, &srvadd, &sd);
             }
         }
