@@ -31,12 +31,14 @@ void renderMenu(SDL_Renderer **renderer, SDL_Window **window, SDL_Texture **back
     SDL_RenderCopy(*renderer, *exitTexture, NULL, &exitButtonRect);
     SDL_RenderPresent(*renderer);
 }
-
-void gameView(SDL_Renderer **renderer, SDL_Window **window, SDL_Texture **texture, SDL_Texture **backgroundTexture, SDL_Texture **blockTexture)
+void gameView(SDL_Renderer **renderer, SDL_Window **window, SDL_Texture **texture, SDL_Texture **texture1, SDL_Texture **backgroundTexture, SDL_Texture **blockTexture)
 {
-
     SDL_Surface *surface = IMG_Load("resources/austrounat.png");
     *texture = SDL_CreateTextureFromSurface(*renderer, surface);
+    SDL_FreeSurface(surface);
+
+    surface = IMG_Load("resources/austrounat1.png");
+    *texture1 = SDL_CreateTextureFromSurface(*renderer, surface);
     SDL_FreeSurface(surface);
 
     // Ladda bakgrundstexturen
@@ -81,31 +83,29 @@ void loadBlock(SDL_Renderer *renderer, SDL_Texture **blockTexture)
     SDL_FreeSurface(surface);
 }
 
-void renderView(SDL_Renderer *renderer, SDL_Texture *shipTexture, SDL_Texture *backgroundTexture, SDL_Texture *blockTexture, GameModel *model, SDL_Rect shipRect)
+void renderView(SDL_Renderer *renderer, SDL_Texture *texture, SDL_Texture *texture1, SDL_Texture *backgroundTexture, SDL_Texture *blockTexture, GameModel *model, SDL_Rect shipRect)
 {
     SDL_RenderClear(renderer);
-    
+
+    SDL_Texture *currentTexture = (model->currentPlayerImage == ASTRONAUT1) ? texture1 : texture;
 
     if (backgroundTexture)
     {
         SDL_RenderCopy(renderer, backgroundTexture, NULL, NULL);
     }
 
-    SDL_RenderCopy(renderer, shipTexture, NULL, &shipRect);
+    SDL_RenderCopy(renderer, currentTexture, NULL, &shipRect);
 
-
-    for (int i = 0; i < 20; i++)
+    for (int i = 0; i < model->activeBlocks; i++)
     {
         placeTile(renderer, blockTexture, model->blockPositions[i].x, model->blockPositions[i].y);
-        drawLives(renderer, model->playerLife, 10, 10); // Visa rektanglar som liv nedanför texten
     }
+
+    drawLives(renderer, model->playerLife, 10, 10); // Visa rektanglar som liv nedanför texten
 
     if (model->lifeActive){
-        drawExtraLife(renderer, model->lifePosX,model->lifePosY);
+        drawExtraLife(renderer, model->lifePosX, model->lifePosY);
     }
-    
-    
-
 
     SDL_RenderPresent(renderer);
 }

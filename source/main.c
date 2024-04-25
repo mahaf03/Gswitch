@@ -23,6 +23,7 @@ int main(int argv, char **args)
     SDL_Window *window = NULL;
     SDL_Renderer *renderer = NULL;
     SDL_Texture *texture = NULL;      // Skeppets textur
+    SDL_Texture *texture1 = NULL;
     SDL_Texture *bgTexture = NULL;    // Bakgrundstextur
     SDL_Texture *blockTexture = NULL; // Blockets textur
     SDL_Texture *continueTexture = NULL;
@@ -161,12 +162,12 @@ int main(int argv, char **args)
             // Uppdatera och rendera spelet
             SDL_DestroyTexture(continueTexture);
             SDL_DestroyTexture(exitTexture);
-            gameView(&renderer, &window, &texture, &bgTexture, &blockTexture);
+            gameView(&renderer, &window, &texture, &texture1, &bgTexture, &blockTexture);
             SDL_Rect shipRect = {(int)model.x, (int)model.y, 50, 50};
             updateModel(&model);
             updateBlocks(&model, shipRect);
             updateGameState(&model);
-            renderView(renderer, texture, bgTexture, blockTexture, &model, shipRect);
+            renderView(renderer, texture, texture1, bgTexture, blockTexture, &model, shipRect);
         }
 
         frameTime = SDL_GetTicks() - frameStart; // Hur länge det tog att processa ramen

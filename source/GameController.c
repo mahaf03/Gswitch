@@ -12,6 +12,7 @@ void handleEvent(SDL_Event* event, GameModel* model, bool* closeWindow) {
                 case SDL_SCANCODE_UP:
                     if(!model->collisionUp){
                         model->up = true;
+                        model->currentPlayerImage = ASTRONAUT1;
                         break;
                     }
                     break;
@@ -19,6 +20,7 @@ void handleEvent(SDL_Event* event, GameModel* model, bool* closeWindow) {
                 case SDL_SCANCODE_LEFT:
                     if(!model->collisionLeft){
                         model->left = true;
+                        model->currentPlayerImage = ASTRONAUT1;
                         break;
                     }
                     break;
@@ -26,6 +28,7 @@ void handleEvent(SDL_Event* event, GameModel* model, bool* closeWindow) {
                 case SDL_SCANCODE_DOWN:
                     if(!model->collisionDown){
                         model->down = true;
+                        model->currentPlayerImage = ASTRONAUT;
                         break;
                     }
                     break;
@@ -33,6 +36,7 @@ void handleEvent(SDL_Event* event, GameModel* model, bool* closeWindow) {
                 case SDL_SCANCODE_RIGHT:
                     if(!model->collisionRight){
                         model->right = true;
+                        model->currentPlayerImage = ASTRONAUT1;
                         break;
                     }
                     break;
@@ -61,7 +65,7 @@ void handleEvent(SDL_Event* event, GameModel* model, bool* closeWindow) {
     }
 }
 void applyGravity(GameModel* model) {
-    const float gravity = 3.0f;  
+    const float gravity = 1.5f;  
    
     if (!model->collisionDown) {
         model->velocityY += gravity;
@@ -72,7 +76,7 @@ void updateModel(GameModel* model) {
     //const float speed = 7.0f;
     model->velocityX = model->velocityY = 0;
 
-    // applyGravity(model);
+     applyGravity(model);
 
     if (model->up && !model->down && !model->collisionUp) model->velocityY = -model->playerSpeed;
     if (model->down && !model->up && !model->collisionDown) model->velocityY = model->playerSpeed;

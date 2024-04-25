@@ -5,6 +5,11 @@
 #include <stdbool.h>
 #include <SDL2/SDL.h>
 
+typedef enum {
+    ASTRONAUT,
+    ASTRONAUT1
+} PlayerImage;
+
 typedef struct {
     float x, y; // Player's position
     float velocityX, velocityY; // Player's velocity
@@ -22,6 +27,7 @@ typedef struct {
     bool lifeActive;
     bool isImmortal;
     Uint32 immortalStartTime;
+    PlayerImage currentPlayerImage; // Current player image
 } GameModel;
 
 
