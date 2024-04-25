@@ -27,7 +27,8 @@ typedef struct {
     bool lifeActive;
     bool isImmortal;
     Uint32 immortalStartTime;
-    PlayerImage currentPlayerImage; // Current player image
+    PlayerImage currentPlayerImage; 
+    int gravityDelayTimer; 
 } GameModel;
 
 

@@ -28,6 +28,7 @@ void initializeModel(GameModel* model) {
     model->lifePosY = 0;
     model->isImmortal = false;  // Initially not immortal
     model->immortalStartTime = 0;  // Reset time
+    model->gravityDelayTimer = 0;
 
     for (int i = 0; i < 30; i++) { // Förbereder alla möjliga block
         model->blockPositions[i].x = 1200 + i * 50;

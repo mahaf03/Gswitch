@@ -28,7 +28,7 @@ void handleEvent(SDL_Event* event, GameModel* model, bool* closeWindow) {
                 case SDL_SCANCODE_DOWN:
                     if(!model->collisionDown){
                         model->down = true;
-                        model->currentPlayerImage = ASTRONAUT;
+                        model->currentPlayerImage = ASTRONAUT;                     
                         break;
                     }
                     break;
@@ -65,9 +65,22 @@ void handleEvent(SDL_Event* event, GameModel* model, bool* closeWindow) {
     }
 }
 void applyGravity(GameModel* model) {
-    const float gravity = 1.5f;  
-   
-    if (!model->collisionDown) {
+    printf("xxxxxxx %d \n", model->gravityDelayTimer);
+    const float gravity = 1.5f;
+    const int delayFrames = 30; // This is approximately half a second if running at 60 fps
+
+    // Initialize the timer if the model starts moving up
+    if (model->up && !model->collisionUp && model->gravityDelayTimer == 0) {
+        model->gravityDelayTimer = delayFrames;
+    }
+
+    // Count down the timer if it's above zero
+    if (model->gravityDelayTimer > 0) {
+        model->gravityDelayTimer--;
+    }
+
+    // Apply gravity only if the timer is zero and there is no collision below
+    if (model->gravityDelayTimer == 0 && !model->collisionDown) {
         model->velocityY += gravity;
     }
 }
