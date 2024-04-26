@@ -156,6 +156,7 @@ int main(int argv, char **args)
             SDL_Rect shipRect = {(int)model.player[0].x, (int)model.player[0].y, 50, 50};
             for(int i = 0; i < 4; i++){
                 SDL_Rect shipRect = {(int)model.player[i].x, (int)model.player[i].y, 50, 50};
+                updatePlayer(&model.player[i]);
             }
             updateBlocks(&model, shipRect);
             updateGameState(&model);
