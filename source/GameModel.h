@@ -33,7 +33,7 @@ typedef struct {
 } GameState;
 
 typedef struct {
-    Player player;
+    Player player[4];
     Environment environment;
     GameState gameState;
 } GameModel;
@@ -41,7 +41,8 @@ typedef struct {
 void initializeModel(GameModel* model);
 int min(int a, int b);
 int checkCollision(SDL_Rect *shipRect, SDL_Rect *blockRect);
-void handleCollision(GameModel* model, SDL_Rect shipRect, SDL_Rect* blockPositions, int numBlocks);
+void handleCollision(Player* player, SDL_Rect shipRect, SDL_Rect* blockPositions, int numBlocks);
+//void handleCollision(GameModel* model, SDL_Rect shipRect, SDL_Rect* blockPositions, int numBlocks);
 void updateBlocks(GameModel* model, SDL_Rect shipRect);
 void updateGameState(GameModel* model);
 void updateCharacterPosition(GameModel* model);
