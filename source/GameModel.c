@@ -20,7 +20,10 @@ void initializeModel(GameModel* model) {
             model->player[i].up = model->player[i].down = model->player[i].left = model->player[i].right = false;
             model->player[i].collisionUp = model->player[i].collisionDown = model->player[i].collisionLeft = model->player[i].collisionRight = false;
             model->player[i].playerSpeed = 4.0f;
+            model->player[i].isImmortal = false;  // Initially not immortal
+            model->player[i].immortalStartTime = 0;  // Reset time
             model->player[i].playerLife = 5;
+        }
             model->environment.blockSpeed = 5;
             model->environment.activeBlocks = 5; // Startar med 5 block
             model->gameState.startTime = SDL_GetTicks(); // Startar tidräknaren
@@ -28,9 +31,6 @@ void initializeModel(GameModel* model) {
             model->gameState.lifeActive = false;
             model->gameState.lifePosX = 0;
             model->gameState.lifePosY = 0;
-            model->player[i].isImmortal = false;  // Initially not immortal
-            model->player[i].immortalStartTime = 0;  // Reset time
-        }
     for (int i = 0; i < 30; i++) { // Förbereder alla möjliga block
         model->environment.blockPositions[i].x = 1200 + i * 50;
         model->environment.blockPositions[i].y = rand() % 750;
@@ -117,7 +117,6 @@ void handleCollision(Player* player, SDL_Rect shipRect, SDL_Rect* blockPositions
                 player->isImmortal = true;
                 player->immortalStartTime = SDL_GetTicks();
             }
-
 
             // Hantera kollision genom att stoppa spelarens rörelse eller justera position
             // Exempel: Stoppa spelaren från att röra sig in i blocket
