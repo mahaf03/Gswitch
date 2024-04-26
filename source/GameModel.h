@@ -32,6 +32,11 @@ typedef struct {
     bool lifeActive;
 } GameState;
 
+typedef struct {
+    Player player;
+    Environment environment;
+    GameState gameState;
+} GameModel;
 
 void initializeModel(GameModel* model);
 int min(int a, int b);
