@@ -6,23 +6,31 @@
 #include <SDL2/SDL.h>
 
 typedef struct {
-    float x, y; // Player's position
-    float velocityX, velocityY; // Player's velocity
-    bool up, down, left, right; // Direction flags
-    bool collisionUp, collisionDown, collisionLeft, collisionRight; // Collision flags
-    SDL_Rect blockPositions[30]; // Antal block du vill ha
-    int blockSpeed;
-    int activeBlocks; 
+    float x, y;  // Player's position
+    float velocityX, velocityY;  // Player's velocity
+    bool up, down, left, right;  // Direction flags
+    bool collisionUp, collisionDown, collisionLeft, collisionRight;  // Collision flags
     float playerSpeed;
     int playerLife; 
+    bool isImmortal;
+    Uint32 immortalStartTime;
+} Player;
+
+typedef struct {
+    SDL_Rect blockPositions[30];  // Array of block positions
+    int blockSpeed;
+    int activeBlocks;
+    int numRocks;
+    int lastRockIncreaseTime;
+} Environment;
+
+typedef struct {
     Uint32 startTime;
     Uint32 lifeSpawnTime;
     int lifePosX;
     int lifePosY;
     bool lifeActive;
-    bool isImmortal;
-    Uint32 immortalStartTime;
-} GameModel;
+} GameState;
 
 
 void initializeModel(GameModel* model);
