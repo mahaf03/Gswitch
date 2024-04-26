@@ -81,7 +81,7 @@ void loadBlock(SDL_Renderer *renderer, SDL_Texture **blockTexture)
     SDL_FreeSurface(surface);
 }
 
-void renderView(SDL_Renderer *renderer, SDL_Texture *shipTexture, SDL_Texture *backgroundTexture, SDL_Texture *blockTexture, GameModel *model, SDL_Rect shipRect)
+void renderView(SDL_Renderer *renderer, SDL_Texture *shipTexture, SDL_Texture *backgroundTexture, SDL_Texture *blockTexture, GameModel *model,Player* player, SDL_Rect shipRect)
 {
     SDL_RenderClear(renderer);
     
@@ -96,12 +96,12 @@ void renderView(SDL_Renderer *renderer, SDL_Texture *shipTexture, SDL_Texture *b
 
     for (int i = 0; i < 20; i++)
     {
-        placeTile(renderer, blockTexture, model->blockPositions[i].x, model->blockPositions[i].y);
-        drawLives(renderer, model->playerLife, 10, 10); // Visa rektanglar som liv nedanför texten
+        placeTile(renderer, blockTexture, model->environment.blockPositions[i].x, model->environment.blockPositions[i].y);
+        drawLives(renderer, player->playerLife, 10, 10); // Visa rektanglar som liv nedanför texten
     }
 
-    if (model->lifeActive){
-        drawExtraLife(renderer, model->lifePosX,model->lifePosY);
+    if (model->gameState.lifeActive){
+        drawExtraLife(renderer, model->gameState.lifePosX,model->gameState.lifePosY);
     }
     
     

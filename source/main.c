@@ -64,12 +64,7 @@ int main(int argv, char **args)
     const int frameDelay = 1000 / FPS; // Tiden varje frame bör ta
     Uint32 frameStart;
     int frameTime;
-    GameModel models[4];
     int playercount = 0;
-    for (int i = 0; i < 4; i++)
-    {
-        initializeModel(&models[i]);
-    }
     // Du måste också passera en pekare till bakgrundstexturen till initView
     // initView(&renderer, &window, &texture, &bgTexture);
     printf("initializing network... \n");
@@ -142,8 +137,8 @@ int main(int argv, char **args)
             }
             if (currentState == Game)
             {
-                handleEvent(&event, &model, &closeWindow);
-                udpDataToServer testdata = {model.x, model.y, 0};
+                handleEvent(&event, &model.player[0], &closeWindow);
+                udpDataToServer testdata = {model.player[0].x, model.player[0].y, 0};
                 clientSendPacket(testdata, &srvadd, &sd);
             }
         }
@@ -158,11 +153,13 @@ int main(int argv, char **args)
             SDL_DestroyTexture(continueTexture);
             SDL_DestroyTexture(exitTexture);
             gameView(&renderer, &window, &texture, &bgTexture, &blockTexture);
-            SDL_Rect shipRect = {(int)model.x, (int)model.y, 50, 50};
-            updateModel(&model);
+            SDL_Rect shipRect = {(int)model.player[0].x, (int)model.player[0].y, 50, 50};
+            for(int i = 0; i < 4; i++){
+                SDL_Rect shipRect = {(int)model.player[i].x, (int)model.player[i].y, 50, 50};
+            }
             updateBlocks(&model, shipRect);
             updateGameState(&model);
-            renderView(renderer, texture, bgTexture, blockTexture, &model, shipRect);
+            renderView(renderer, texture, bgTexture, blockTexture, &model, &player[0], shipRect);
         }
 
         frameTime = SDL_GetTicks() - frameStart; // Hur länge det tog att processa ramen
@@ -173,18 +170,18 @@ int main(int argv, char **args)
         {
             printf("new message from %x:\n", addrr.host);
             playercount = message.playercount;
-            for (int i = 0; i < message.playercount; i++)
+            for (int i = 1; i <= message.playercount; i++)
             {
                 printf("\tplayer %d at %f %f\n", i, message.playerPositions[i].x, message.playerPositions[i].y);
-                models[i].x = message.playerPositions[i].x;
-                models[i].y = message.playerPositions[i].y;
+                model.player[i].x = message.playerPositions[i].x;
+                model.player[i].y = message.playerPositions[i].y;
             }
         }
         for (int i = 0; i < playercount; i++)
         {
-            models[i].x = message.playerPositions[i].x;
-            models[i].y = message.playerPositions[i].y;
-            updateModel(&models[i]);
+            model.player[i].x = message.playerPositions[i].x;
+            model.player[i].y = message.playerPositions[i].y;
+            updatePlayer(&model.player[i]);
         }
 
         if (frameDelay > frameTime)
