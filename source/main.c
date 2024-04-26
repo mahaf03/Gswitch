@@ -14,7 +14,7 @@ typedef enum
     MusicOn,
     MusicOff
 
-} GameState;
+} GameStates;
 
 int main(int argv, char **args)
 {
@@ -87,8 +87,8 @@ int main(int argv, char **args)
     }
 
     bool closeWindow = false;
-    GameState currentState = Menu;
-    GameState currentMusicState = MusicOn;
+    GameStates currentState = Menu;
+    GameStates currentMusicState = MusicOn;
 
     while (!closeWindow)
     {
@@ -159,7 +159,7 @@ int main(int argv, char **args)
             }
             updateBlocks(&model, shipRect);
             updateGameState(&model);
-            renderView(renderer, texture, bgTexture, blockTexture, &model, &player[0], shipRect);
+            renderView(renderer, texture, bgTexture, blockTexture, &model, &model.player[0], shipRect);
         }
 
         frameTime = SDL_GetTicks() - frameStart; // Hur länge det tog att processa ramen
