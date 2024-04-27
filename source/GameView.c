@@ -91,7 +91,14 @@ void renderView(SDL_Renderer *renderer, SDL_Texture *shipTexture, SDL_Texture *b
         SDL_RenderCopy(renderer, backgroundTexture, NULL, NULL);
     }
 
-    SDL_RenderCopy(renderer, shipTexture, NULL, &shipRect);
+    SDL_Rect shipRectPlayers[4];
+
+    for (int i = 0; i < 4; i++) {
+        SDL_Rect shipRectPlayersI = { (int)model->player[i].x, (int)model->player[i].y, 50, 50 };
+        shipRectPlayers[i] = shipRectPlayersI;
+        SDL_RenderCopy(renderer, shipTexture, NULL, &shipRectPlayers[i]);
+    }
+
 
 
     for (int i = 0; i < 20; i++)
@@ -105,7 +112,6 @@ void renderView(SDL_Renderer *renderer, SDL_Texture *shipTexture, SDL_Texture *b
     }
     
     
-
 
     SDL_RenderPresent(renderer);
 }
