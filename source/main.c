@@ -19,7 +19,6 @@ typedef enum
 int main(int argv, char **args)
 {
     SDL_Init(SDL_INIT_VIDEO);
-
     SDL_Window *window = NULL;
     SDL_Renderer *renderer = NULL;
     SDL_Texture *texture = NULL;      // Skeppets textur
@@ -90,6 +89,8 @@ int main(int argv, char **args)
     GameStates currentState = Menu;
     GameStates currentMusicState = MusicOn;
 
+    float prePosX = model.player[0].x;
+    float prePosY = model.player[0].y;
     while (!closeWindow)
     {
         frameStart = SDL_GetTicks();
@@ -126,6 +127,7 @@ int main(int argv, char **args)
                         {
                             Mix_PauseMusic();
                             currentMusicState = MusicOff;
+
                         }
                         else
                         {
@@ -138,8 +140,6 @@ int main(int argv, char **args)
             if (currentState == Game)
             {
                 handleEvent(&event, &model.player[0], &closeWindow);
-                udpDataToServer testdata = {model.player[0].x, model.player[0].y, 0};
-                clientSendPacket(testdata, &srvadd, &sd);
             }
         }
         if (currentState == Menu)
@@ -153,18 +153,32 @@ int main(int argv, char **args)
             SDL_DestroyTexture(continueTexture);
             SDL_DestroyTexture(exitTexture);
             gameView(&renderer, &window, &texture, &bgTexture, &blockTexture);
-            SDL_Rect shipRect = {(int)model.player[0].x, (int)model.player[0].y, 50, 50};
+            //Move players
             for(int i = 0; i < 4; i++){
                 SDL_Rect shipRect = {(int)model.player[i].x, (int)model.player[i].y, 50, 50};
                 updatePlayer(&model.player[i]);
             }
+            const float THRESHOLD = 100.f;
+            float diffX = prePosX - model.player[0].x;
+            float diffY = prePosY - model.player[0].y;
+            float squarediff = diffX*diffX + diffY*diffY;
+            if( 1/invSqrt(squarediff) > THRESHOLD)
+                {
+                    //Send data to server
+                    udpDataToServer testdata = {model.player[0].x, model.player[0].y, 0};
+                    clientSendPacket(testdata, &srvadd, &sd);
+                    prePosX = model.player[0].x;
+                    prePosY = model.player[0].y;
+                    printf("sent data to server \n\tx: %f\n\ty: %f\n",prePosX,prePosY);
+                }
+
+            SDL_Rect shipRect = {(int)model.player[0].x, (int)model.player[0].y, 50, 50};
             updateBlocks(&model, shipRect);
             updateGameState(&model);
             renderView(renderer, texture, bgTexture, blockTexture, &model, &model.player[0], shipRect);
         }
 
         frameTime = SDL_GetTicks() - frameStart; // Hur länge det tog att processa ramen
-
         udpDataToClient message;
         IPaddress addrr = clientReceivePacket(&message, &sd);
         if (addrr.host != 0 && addrr.port != 0)
