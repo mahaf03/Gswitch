@@ -47,7 +47,7 @@ int main(int argv, char **args)
         success = false;
     }
 
-    Mix_Music *backgroundMusic = Mix_LoadMUS("resources/music.mp3");
+    Mix_Music *backgroundMusic = Mix_LoadMUS("resources/music2.mp3");
     if (backgroundMusic == NULL)
     {
         printf("Failed to load background music! SDL_mixer Error: %s\n", Mix_GetError());
@@ -86,8 +86,8 @@ int main(int argv, char **args)
     }
 
     bool closeWindow = false;
-    GameStates currentState = Menu;
     GameStates currentMusicState = MusicOn;
+    GameStates currentState = Menu;
 
     float prePosX = model.player[0].x;
     float prePosY = model.player[0].y;
@@ -181,6 +181,7 @@ int main(int argv, char **args)
         frameTime = SDL_GetTicks() - frameStart; // Hur länge det tog att processa ramen
         udpDataToClient message;
         IPaddress addrr = clientReceivePacket(&message, &sd);
+        //clientReceivePacket(&message, &sd);
         if (addrr.host != 0 && addrr.port != 0)
         {
             printf("new message from %x:\n", addrr.host);
@@ -192,12 +193,14 @@ int main(int argv, char **args)
                 model.player[i].y = message.playerPositions[i].y;
             }
         }
-        for (int i = 0; i < playercount; i++)
+        /*
+          for (int i = 0; i < playercount; i++)
         {
             model.player[i].x = message.playerPositions[i].x;
             model.player[i].y = message.playerPositions[i].y;
             updatePlayer(&model.player[i]);
         }
+        */
 
         if (frameDelay > frameTime)
         {
