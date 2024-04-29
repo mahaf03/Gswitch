@@ -33,48 +33,63 @@ int main(int argc, char **argv)
     IPaddress host;
     host = serverReceivePacket(&message, &sd);
     int gotPkg = (host.host != 0 && host.port != 0);
+
     if (gotPkg)
-    {
-      int playerNo = -1;
-      for (int i = 0; i < 4; i++)
       {
-        if ((players[i].host == 0 && players[i].port == 0) || (host.host == players[i].host && host.port == players[i].port))
-        {
-          // We got a package from either a new player or player i
-          if (players[i].host == 0 && players[i].port == 0)
+        int playerNo = -1;
+        for (int i = 0; i < 4; i++)
           {
-            //dataSend.playercount++;
-            printf("Player %d connected! \n \t %x \n \t %d\n", i + 1, host.host, host.port);
+            if ((players[i].host == 0 && players[i].port == 0) || (host.host == players[i].host && host.port == players[i].port))
+              {
+                // We got a package from either a new player or player i
+                if (players[i].host == 0 && players[i].port == 0)
+                  {
+                    //dataSend.playercount++;
+                    playercount++;
+                    printf("Player %d connected! \n \t %x \n \t %d\n", i + 1, host.host, host.port);
+                  }
+                players[i] = host;
+                playerNo = i;
+                /*
+                for (int i = 0; i < playercount; i++)
+                  {
+                    dataSend.player = message.player;
+                    // Kolla så att det bara till skickas anslutna spelare och inte skickar tillbaka paketet till orginalsändaren
+                    if (players[i].host != 0)
+                      {
+                        serverSendPacket(dataSend, &players[i], &sd);
+                        printf ("sent data to player\n");
+                      }
+                  }
+                  */
+                break;
+              }
           }
-          players[i] = host;
-          playerNo = i;
-          break;
-        }
-      }
+        printf("we are here!");
+        if (playerNo != -1) // Kollar ifall en spelar har anslutit sig/uppdaterat sin position
+          {
+            //we got a new message from playerNo
+            //printf("New packet received from Player %d at %x !\n\t %f %f %d \n", playerNo + 1, host.host, message.xPos, message.yPos, message.status);
+            //struct PlayerPos position = {message.xPos, message.yPos};
+            //dataSend.playerPositions[playerNo] = position;
 
-      if (playerNo != -1) // Kollar ifall en spelar har anslutit sig/uppdaterat sin position
-      {
-        //we got a new message from playerNo
-        //printf("New packet received from Player %d at %x !\n\t %f %f %d \n", playerNo + 1, host.host, message.xPos, message.yPos, message.status);
-        //struct PlayerPos position = {message.xPos, message.yPos};
-        //dataSend.playerPositions[playerNo] = position;
-
-        // Kollar ifall spelaren har disconnectat
-        if (message.status == 3)
-        {
-          quit = 1;
-        }
+            // Kollar ifall spelaren har disconnectat
+            if (message.status == 3)
+              {
+                quit = 1;
+              }
 
         // Skickar tillbaka uppdaterad data till alla anslutna spelare
         for (int i = 0; i < playercount; i++)
-        {
-            dataSend.player = message.player;
-        // Kolla så att det bara skickas till anslutna spelare och inte skickar tillbaka paketet till orginalsändaren
-          if (players[i].host != 0 && players[i].host != host.host )
           {
-            serverSendPacket(dataSend, &players[i], &sd);
+            dataSend.player = message.player;
+            // Kolla så att det bara till skickas anslutna spelare och inte skickar tillbaka paketet till orginalsändaren
+            if (players[i].host != 0)
+              {
+                serverSendPacket(dataSend, &players[i], &sd);
+                printf ("sent data to player\n");
+              }
           }
-        }
       }
     }
 

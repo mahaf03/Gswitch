@@ -10,7 +10,7 @@
 #include "GameModel.h"
 
 #define NETWORK_PORT (49156)
-#define SERVERADDRESS "84.243.23.44" // Placeholder for server network address
+#define SERVERADDRESS "127.0.0.1" // Placeholder for server network address
 //struct defining data sent between client and server
 typedef struct udpDataToServer{
   Player player;

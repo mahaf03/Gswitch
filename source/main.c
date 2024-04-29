@@ -173,13 +173,13 @@ int main(int argv, char **args)
                     clientSendPacket(testdata, &srvadd, &sd);
 
                     /*utskrift*/
-                    prePosX = model.player[0].x;
-                    prePosY = model.player[0].y;
-                    printf("sent data to server \n\tx: %f\n\ty: %f\n",prePosX,prePosY);
+                  prePosX = model.player[0].x;
+                   prePosY = model.player[0].y;
+                    //printf("sent data to server \n\tx: %f\n\ty: %f\n",prePosX,prePosY);
                 }
 
             SDL_Rect shipRect = {(int)model.player[0].x, (int)model.player[0].y, 50, 50};
-            updateBlocks(&model, shipRect);
+            //updateBlocks(&model, shipRect);
             updateGameState(&model);
             // if move, then send to server.
             renderView(renderer, texture, bgTexture, blockTexture, &model, &model.player[0], shipRect);
@@ -188,12 +188,13 @@ int main(int argv, char **args)
         frameTime = SDL_GetTicks() - frameStart; // Hur länge det tog att processa ramen
         udpDataToClient message;
         IPaddress addrr = clientReceivePacket(&message, &sd);
-        //clientReceivePacket(&message, &sd);
+        clientReceivePacket(&message, &sd);
         if (addrr.host != 0 && addrr.port != 0) // har vi tagit emot något??
         {
             printf("new message from %x:\n", addrr.host);
-
             model.player[1] =  message.player;
+            model.player[1].velocityX = 0.f;
+            model.player[1].velocityY = 0.f;
             /*
             //playercount = message.playercount;
             for (int i = 1; i <= message.playercount; i++)
