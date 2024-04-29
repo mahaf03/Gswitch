@@ -7,13 +7,13 @@
 #include <SDL2/SDL_timer.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_net.h>
+#include "GameModel.h"
 
 #define NETWORK_PORT (49156)
 #define SERVERADDRESS "84.243.23.44" // Placeholder for server network address
 //struct defining data sent between client and server
 typedef struct udpDataToServer{
-  float xPos; // players x-coordinate
-  float yPos; // players y-coordinate
+  Player player;
   int status; //idk what this is
     }udpDataToServer;
 typedef struct PlayerPos
@@ -22,8 +22,10 @@ typedef struct PlayerPos
   float y;
 } playerPos;
 typedef struct udpDataToClient{
-  int playercount;// players x-coordinate
-  playerPos playerPositions[4];// players x&y-coordinates
+  Player player;
+
+//  int playercount;// players x-coordinate
+ // playerPos playerPositions[4];// players x&y-coordinates
   int status; //idk what this is
     } udpDataToClient;
 void initNetwork_Client( UDPsocket* sd, IPaddress* srvadd, UDPpacket* pRecieve);

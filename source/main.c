@@ -13,7 +13,6 @@ typedef enum
     Game,
     MusicOn,
     MusicOff
-
 } GameStates;
 
 int main(int argv, char **args)
@@ -79,6 +78,7 @@ int main(int argv, char **args)
         fprintf(stderr, "SDLNet_AllocPacket: %s\n", SDLNet_GetError());
         exit(EXIT_FAILURE);
     }
+
     if (!((pReceive = SDLNet_AllocPacket(512))))
     {
         fprintf(stderr, "SDLNet_AllocPacket: %s\n", SDLNet_GetError());
@@ -153,7 +153,7 @@ int main(int argv, char **args)
             // Uppdatera och rendera spelet
             SDL_DestroyTexture(continueTexture);
             SDL_DestroyTexture(exitTexture);
-          //  gameView(&renderer, &window, &texture, &bgTexture, &blockTexture);
+
             //Move players
             for(int i = 0; i < 4; i++){
                 SDL_Rect shipRect = {(int)model.player[i].x, (int)model.player[i].y, 50, 50};
@@ -166,8 +166,10 @@ int main(int argv, char **args)
             if( 1/invSqrt(squarediff) > THRESHOLD)
                 {
                     //Send data to server
-                    udpDataToServer testdata = {model.player[0].x, model.player[0].y, 0};
+                    udpDataToServer testdata = {model.player[0], 0};
                     clientSendPacket(testdata, &srvadd, &sd);
+
+                    /*utskrift*/
                     prePosX = model.player[0].x;
                     prePosY = model.player[0].y;
                     printf("sent data to server \n\tx: %f\n\ty: %f\n",prePosX,prePosY);
@@ -176,6 +178,7 @@ int main(int argv, char **args)
             SDL_Rect shipRect = {(int)model.player[0].x, (int)model.player[0].y, 50, 50};
             updateBlocks(&model, shipRect);
             updateGameState(&model);
+            // if move, then send to server.
             renderView(renderer, texture, bgTexture, blockTexture, &model, &model.player[0], shipRect);
         }
 
@@ -186,13 +189,15 @@ int main(int argv, char **args)
         if (addrr.host != 0 && addrr.port != 0)
         {
             printf("new message from %x:\n", addrr.host);
-            playercount = message.playercount;
+            /*
+            //playercount = message.playercount;
             for (int i = 1; i <= message.playercount; i++)
             {
                 printf("\tplayer %d at %f %f\n", i, message.playerPositions[i].x, message.playerPositions[i].y);
                 model.player[i].x = message.playerPositions[i].x;
                 model.player[i].y = message.playerPositions[i].y;
             }
+            */
         }
         /*
           for (int i = 0; i < playercount; i++)
