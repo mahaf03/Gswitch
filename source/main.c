@@ -162,7 +162,7 @@ int main(int argv, char **args)
 
 
             /*NETWORKING*/
-            const float THRESHOLD = 100.f;
+            const float THRESHOLD = 5.f;
             float diffX = prePosX - model.player[0].x;
             float diffY = prePosY - model.player[0].y;
             float squarediff = diffX*diffX + diffY*diffY;

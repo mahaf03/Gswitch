@@ -37,6 +37,7 @@ int main(int argc, char **argv)
     if (gotPkg)
       {
         int playerNo = -1;
+
         for (int i = 0; i < 4; i++)
           {
             if ((players[i].host == 0 && players[i].port == 0) || (host.host == players[i].host && host.port == players[i].port))
