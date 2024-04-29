@@ -17,6 +17,7 @@ typedef enum
 
 int main(int argv, char **args)
 {
+
     SDL_Init(SDL_INIT_VIDEO);
     SDL_Window *window = NULL;
     SDL_Renderer *renderer = NULL;
@@ -38,6 +39,11 @@ int main(int argv, char **args)
     SDL_Rect MuteButtonRect = {500, 430, 150, 150}; // Positionerad under "Continue" knappen med 50 pixels mellanrum
 
     initializeModel(&model);
+    for (int i=0; i<4;i++)
+        {
+            strcpy(model.player[i].playerName,"");
+        }
+    strcpy(model.player[0].playerName,*args);
 
     bool success = true;
     if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0)
@@ -162,7 +168,7 @@ int main(int argv, char **args)
 
 
             /*NETWORKING*/
-            const float THRESHOLD = 100.f;
+            const float THRESHOLD = 5.f;
             float diffX = prePosX - model.player[0].x;
             float diffY = prePosY - model.player[0].y;
             float squarediff = diffX*diffX + diffY*diffY;
@@ -193,13 +199,21 @@ int main(int argv, char **args)
         {
             printf("new message from %x:\n", addrr.host);
             printf("\tx:\t%f\n\ty:\t%f\n}",message.player.x,message.player.y);
-            model.player[1] =  message.player;
-            model.player[1].velocityX = 0.f;
-            model.player[1].velocityY = 0.f;
-            model.player[1].up= 0;
-            model.player[1].down= 0;
-            model.player[1].right= 0;
-            model.player[1].left= 0;
+            for (int i=0 ;i<4;i++)
+                {
+                    if (strcmp(model.player[i].playerName,message.player.playerName))
+                        {
+                            model.player[i] =  message.player;
+                            model.player[i].velocityX = 0.f;
+                            model.player[i].velocityY = 0.f;
+                            model.player[i].up= 0;
+                            model.player[i].down= 0;
+                            model.player[i].right= 0;
+                            model.player[i].left= 0;
+                            break;
+                        }
+                }
+
             /*
             //playercount = message.playercount;
             for (int i = 1; i <= message.playercount; i++)

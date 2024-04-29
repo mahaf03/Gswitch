@@ -4,6 +4,7 @@
 
 #include <stdbool.h>
 #include <SDL2/SDL.h>
+#include <string.h>
 
 typedef struct {
     float x, y;  // Player's position
@@ -14,6 +15,7 @@ typedef struct {
     int playerLife; 
     bool isImmortal;
     Uint32 immortalStartTime;
+    char playerName[50];
 } Player;
 
 typedef struct {
