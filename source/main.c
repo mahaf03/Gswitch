@@ -192,9 +192,14 @@ int main(int argv, char **args)
         if (addrr.host != 0 && addrr.port != 0) // har vi tagit emot något??
         {
             printf("new message from %x:\n", addrr.host);
+            printf("\tx:\t%f\n\ty:\t%f\n}",message.player.x,message.player.y);
             model.player[1] =  message.player;
             model.player[1].velocityX = 0.f;
             model.player[1].velocityY = 0.f;
+            model.player[1].up= 0;
+            model.player[1].down= 0;
+            model.player[1].right= 0;
+            model.player[1].left= 0;
             /*
             //playercount = message.playercount;
             for (int i = 1; i <= message.playercount; i++)

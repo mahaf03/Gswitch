@@ -65,11 +65,11 @@ int main(int argc, char **argv)
                 break;
               }
           }
-        printf("we are here!");
+        //printf("we are here!");
         if (playerNo != -1) // Kollar ifall en spelar har anslutit sig/uppdaterat sin position
           {
             //we got a new message from playerNo
-            //printf("New packet received from Player %d at %x !\n\t %f %f %d \n", playerNo + 1, host.host, message.xPos, message.yPos, message.status);
+            printf("New packet received from Player %d at %x !\n\t %f %f %d \n", playerNo + 1, host.host, message.player.x, message.player.y, message.status);
             //struct PlayerPos position = {message.xPos, message.yPos};
             //dataSend.playerPositions[playerNo] = position;
 
@@ -82,9 +82,12 @@ int main(int argc, char **argv)
         // Skickar tillbaka uppdaterad data till alla anslutna spelare
         for (int i = 0; i < playercount; i++)
           {
+            printf("\t%d\t",i);
             dataSend.player = message.player;
-            // Kolla så att det bara till skickas anslutna spelare och inte skickar tillbaka paketet till orginalsändaren
+            printf("\thost: %d player[i].host: %d\n",host.host,players[i].host);
             if (players[i].host != 0)
+            // Kolla så att det bara till skickas anslutna spelare och inte skickar tillbaka paketet till orginalsändaren
+            if (players[i].host != 0 && !(players[i].host ==host.host && players[i].port == host.port)  )
               {
                 serverSendPacket(dataSend, &players[i], &sd);
                 printf ("sent data to player\n");
