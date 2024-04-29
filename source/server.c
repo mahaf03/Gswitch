@@ -3,7 +3,7 @@
 #include <string.h>
 #include "SDL2/SDL_net.h"
 #include "Network.h"
-#define MAX_PLAYERS 4;
+//#define MAX_PLAYERS 4;
 
 int main(int argc, char **argv)
 {
@@ -12,9 +12,9 @@ int main(int argc, char **argv)
   Uint32 frameStart;
   printf("opening server..\n");
   udpDataToClient dataSend = {};
-  dataSend.status = 0;
-  IPaddress players[MAX_PLAYERS];
   int playercount = 0;
+  dataSend.status = 0;
+  IPaddress players[4];
   for (int i = 0; i < 4; i++)
   {
     IPaddress empty = {0, 0};

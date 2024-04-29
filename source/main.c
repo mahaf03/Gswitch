@@ -201,7 +201,7 @@ int main(int argv, char **args)
             printf("\tx:\t%f\n\ty:\t%f\n}",message.player.x,message.player.y);
             for (int i=0 ;i<4;i++)
                 {
-                    if (strcmp(model.player[i].playerName,message.player.playerName))
+                    if (strcmp(model.player[i].playerName,message.player.playerName) || strcmp(model.player[i].playerName,"") )
                         {
                             model.player[i] =  message.player;
                             model.player[i].velocityX = 0.f;
