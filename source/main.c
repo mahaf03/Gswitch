@@ -112,6 +112,7 @@ int main(int argv, char **args)
                         mouseY >= continueButtonRect.y && mouseY <= continueButtonRect.y + continueButtonRect.h)
                     {
                         printf("Pressed continue button\n");
+                        gameView(&renderer, &window, &texture, &bgTexture, &blockTexture);
                         currentState = Game;
                     }
                     else if (mouseX >= exitButtonRect.x && mouseX <= exitButtonRect.x + exitButtonRect.w &&
@@ -152,7 +153,7 @@ int main(int argv, char **args)
             // Uppdatera och rendera spelet
             SDL_DestroyTexture(continueTexture);
             SDL_DestroyTexture(exitTexture);
-            gameView(&renderer, &window, &texture, &bgTexture, &blockTexture);
+          //  gameView(&renderer, &window, &texture, &bgTexture, &blockTexture);
             //Move players
             for(int i = 0; i < 4; i++){
                 SDL_Rect shipRect = {(int)model.player[i].x, (int)model.player[i].y, 50, 50};

@@ -61,7 +61,6 @@ void updateBlocks(GameModel* model, SDL_Rect shipRect) {
         }
         model->environment.blockSpeed = 10;
     }
-    model->environment.activeBlocks = 0; // debug rad, deen ska inte vara här
    for (int i=0;i<4;i++)
        {
            handleCollision(&model->player[i], shipRect, model->environment.blockPositions, model->environment.activeBlocks);
