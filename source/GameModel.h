@@ -14,6 +14,7 @@ typedef struct {
     int playerLife; 
     bool isImmortal;
     Uint32 immortalStartTime;
+    int playerID;
 } Player;
 
 typedef struct {

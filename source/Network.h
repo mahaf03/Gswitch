@@ -23,6 +23,7 @@ typedef struct PlayerPos
 } playerPos;
 typedef struct udpDataToClient{
   Player player;
+  int clientId;
 
   //  int playercount;// players x-coordinate
   // plyerPos playerPositions[4];// players x&y-coordinates

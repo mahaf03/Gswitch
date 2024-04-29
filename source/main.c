@@ -173,8 +173,8 @@ int main(int argv, char **args)
                     clientSendPacket(testdata, &srvadd, &sd);
 
                     /*utskrift*/
-                  prePosX = model.player[0].x;
-                   prePosY = model.player[0].y;
+                    prePosX = model.player[0].x;
+                    prePosY = model.player[0].y;
                     //printf("sent data to server \n\tx: %f\n\ty: %f\n",prePosX,prePosY);
                 }
 
@@ -193,31 +193,28 @@ int main(int argv, char **args)
         {
             printf("new message from %x:\n", addrr.host);
             printf("\tx:\t%f\n\ty:\t%f\n}",message.player.x,message.player.y);
-            model.player[1] =  message.player;
-            model.player[1].velocityX = 0.f;
-            model.player[1].velocityY = 0.f;
-            model.player[1].up= 0;
-            model.player[1].down= 0;
-            model.player[1].right= 0;
-            model.player[1].left= 0;
-            /*
-            //playercount = message.playercount;
-            for (int i = 1; i <= message.playercount; i++)
-            {
-                printf("\tplayer %d at %f %f\n", i, message.playerPositions[i].x, message.playerPositions[i].y);
-                model.player[i].x = message.playerPositions[i].x;
-                model.player[i].y = message.playerPositions[i].y;
-            }
-            */
+            model.player[0].playerID = message.clientId;
+            for (int i =0;i<4;i++)
+                {
+                    if(model.player[i].playerID ==-1)
+                        {
+                            model.player[i].playerID = message.player.playerID;
+                        }
+                    if (model.player[i].playerID == message.player.playerID && message.player.playerID != message.clientId)
+                        {
+                           model.player[i].x = message.player.x;
+                           model.player[i].y = message.player.y;
+                           /*model.player[i].velocityX = 0.f;
+                           model.player[i].velocityY = 0.f;
+                           model.player[i].up= 0;
+                           model.player[i].down= 0;
+                           model.player[i].right= 0;
+                           model.player[i].left= 0;
+                           */
+                           break;
+                        }
+                }
         }
-        /*
-          for (int i = 0; i < playercount; i++)
-        {
-            model.player[i].x = message.playerPositions[i].x;
-            model.player[i].y = message.playerPositions[i].y;
-            updatePlayer(&model.player[i]);
-        }
-        */
 
         if (frameDelay > frameTime)
         {

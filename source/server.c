@@ -6,6 +6,7 @@
 
 int main(int argc, char **argv)
 {
+
   UDPsocket sd;
   UDPpacket *pSent;
   Uint32 frameStart;
@@ -45,28 +46,14 @@ int main(int argc, char **argv)
                 // We got a package from either a new player or player i
                 if (players[i].host == 0 && players[i].port == 0)
                   {
-                    //dataSend.playercount++;
                     playercount++;
                     printf("Player %d connected! \n \t %x \n \t %d\n", i + 1, host.host, host.port);
                   }
                 players[i] = host;
                 playerNo = i;
-                /*
-                for (int i = 0; i < playercount; i++)
-                  {
-                    dataSend.player = message.player;
-                    // Kolla så att det bara till skickas anslutna spelare och inte skickar tillbaka paketet till orginalsändaren
-                    if (players[i].host != 0)
-                      {
-                        serverSendPacket(dataSend, &players[i], &sd);
-                        printf ("sent data to player\n");
-                      }
-                  }
-                  */
-                break;
+               break;
               }
           }
-        //printf("we are here!");
         if (playerNo != -1) // Kollar ifall en spelar har anslutit sig/uppdaterat sin position
           {
             //we got a new message from playerNo
@@ -90,6 +77,7 @@ int main(int argc, char **argv)
             // Kolla så att det bara till skickas anslutna spelare och inte skickar tillbaka paketet till orginalsändaren
             if (players[i].host != 0 && !(players[i].host ==host.host && players[i].port == host.port)  )
               {
+                dataSend.clientId = i;
                 serverSendPacket(dataSend, &players[i], &sd);
                 printf ("sent data to player\n");
               }
