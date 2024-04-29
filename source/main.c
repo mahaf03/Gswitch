@@ -159,6 +159,9 @@ int main(int argv, char **args)
                 SDL_Rect shipRect = {(int)model.player[i].x, (int)model.player[i].y, 50, 50};
                 updatePlayer(&model.player[i]);
             }
+
+
+            /*NETWORKING*/
             const float THRESHOLD = 100.f;
             float diffX = prePosX - model.player[0].x;
             float diffY = prePosY - model.player[0].y;
@@ -186,9 +189,11 @@ int main(int argv, char **args)
         udpDataToClient message;
         IPaddress addrr = clientReceivePacket(&message, &sd);
         //clientReceivePacket(&message, &sd);
-        if (addrr.host != 0 && addrr.port != 0)
+        if (addrr.host != 0 && addrr.port != 0) // har vi tagit emot något??
         {
             printf("new message from %x:\n", addrr.host);
+
+            model.player[1] =  message.player;
             /*
             //playercount = message.playercount;
             for (int i = 1; i <= message.playercount; i++)
