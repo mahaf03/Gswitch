@@ -139,9 +139,9 @@ void handleCollision(Player* player, SDL_Rect shipRect, SDL_Rect* blockPositions
                 player->x = blockPositions[i].x + blockPositions[i].w;
                 player->collisionLeft = true;
             }
-            
+
         }
-    }
+        }
     
     }
 
@@ -184,20 +184,16 @@ void updateCharacterPosition(GameModel* model) {
        model->player[i].y += model->player[i].velocityY;
 
        // Clamp position to stay within the window
+
        if (model->player[i].x < 0) {
            model->player[i].x = 0;
-           model->player[i].collisionLeft = true;  // Optional: Set collision flag if needed
        } else if (model->player[i].x > WINDOW_WIDTH - SHIP_WIDTH) {
            model->player[i].x = WINDOW_WIDTH - SHIP_WIDTH;
-           model->player[i].collisionRight = true;  // Optional: Set collision flag if needed
        }
-
        if (model->player[i].y < 0) {
-           model->player[i].y = WINDOW_HEIGHT - SHIP_HEIGHT - SHIP_HEIGHT;
-           model->player[i].collisionUp = true;  // Optional: Set collision flag if needed
-       } else if (model->player[i].y > WINDOW_HEIGHT - SHIP_HEIGHT - SHIP_HEIGHT) {
            model->player[i].y = 0;
-           model->player[i].collisionDown = true;  // Optional: Set collision flag if needed
+       } else if (model->player[i].y > WINDOW_HEIGHT - SHIP_HEIGHT - SHIP_HEIGHT-SHIP_HEIGHT/2.f) {
+           model->player[i].y = WINDOW_HEIGHT - SHIP_HEIGHT - SHIP_HEIGHT-SHIP_HEIGHT/2.f;
        }
    }
 }
