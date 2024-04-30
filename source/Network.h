@@ -24,9 +24,6 @@ typedef struct PlayerPos
 typedef struct udpDataToClient{
   Player player;
   int clientId;
-
-  //  int playercount;// players x-coordinate
-  // plyerPos playerPositions[4];// players x&y-coordinates
   int status; //idk what this is
     } udpDataToClient;
 void initNetwork_Client( UDPsocket* sd, IPaddress* srvadd, UDPpacket* pRecieve);
