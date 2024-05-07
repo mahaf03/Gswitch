@@ -12,60 +12,67 @@
 
 void initializeModel(GameModel* model) {
     srand((unsigned int)time(NULL));
-    model->x = 400;
-    model->y = 350;
-    model->velocityX = model->velocityY = 0;
-    model->up = model->down = model->left = model->right = false;
-    model->collisionUp = model->collisionDown = model->collisionLeft = model->collisionRight = false;
-    model->blockSpeed = 5;
-    model->playerSpeed = 4.0f;
-    model->playerLife = 5;
-    model->activeBlocks = 5; // Startar med 5 block
-    model->startTime = SDL_GetTicks(); // Startar tidräknaren
-    model->lifeSpawnTime = SDL_GetTicks();
-    model->lifeActive = false;
-    model->lifePosX = 0;
-    model->lifePosY = 0;
-    model->isImmortal = false;  // Initially not immortal
-    model->immortalStartTime = 0;  // Reset time
-    model->gravityDelayTimer = 0;
-
+    for (int i =0; i<4;i++)
+        {
+            model->player[i].x = 400;
+            model->player[i].y = 350;
+            model->player[i].velocityX = model->player[i].velocityY = 0;
+            model->player[i].up = model->player[i].down = model->player[i].left = model->player[i].right = false;
+            model->player[i].collisionUp = model->player[i].collisionDown = model->player[i].collisionLeft = model->player[i].collisionRight = false;
+            model->player[i].playerSpeed = 4.0f;
+            model->player[i].isImmortal = false;  // Initially not immortal
+            model->player[i].immortalStartTime = 0;  // Reset time
+            model->player[i].playerLife = 5;
+            model ->player[i].playerID = -1;
+        }
+    model->environment.blockSpeed = 5;
+    model->environment.activeBlocks = 5; // Startar med 5 block
+    model->gameState.startTime = SDL_GetTicks(); // Startar tidräknaren
+    model->gameState.lifeSpawnTime = SDL_GetTicks();
+    model->gameState.lifeActive = false;
+    model->gameState.lifePosX = 0;
+    model->gameState.lifePosY = 0;
     for (int i = 0; i < 30; i++) { // Förbereder alla möjliga block
-        model->blockPositions[i].x = 1200 + i * 50;
-        model->blockPositions[i].y = rand() % 750;
-        model->blockPositions[i].w = 50;
-        model->blockPositions[i].h = 50;
+        model->environment.blockPositions[i].x = 1200 + i * 50;
+        model->environment.blockPositions[i].y = rand() % 750;
+        model->environment.blockPositions[i].w = 50;
+        model->environment.blockPositions[i].h = 50;
     }
 }
 
-
-
 void updateBlocks(GameModel* model, SDL_Rect shipRect) {
     Uint32 currentTime = SDL_GetTicks();
-    Uint32 elapsedTime = (currentTime - model->startTime) / 1000; // Konverterar ms till sekunder
+    Uint32 elapsedTime = (currentTime - model->gameState.startTime) / 1000; // Konverterar ms till sekunder
 
     // Uppdatera antalet aktiva block baserat på tiden
     if (elapsedTime < 12) {
-        model->activeBlocks = 5;    
+        model->environment.activeBlocks = 5;
     } else if (elapsedTime < 25) {
-        model->activeBlocks = 10;
-        model->playerSpeed = 5.0f;
-        model->blockSpeed = 8;
+        model->environment.activeBlocks = 10;
+        for (int i =0; i<4;i++){
+            model->player[i].playerSpeed = 5.0f;
+        }
+        model->environment.blockSpeed = 8;
     } else {
-        model->activeBlocks = 20;
-        model->playerSpeed = 8.0f;
-        model->blockSpeed = 10;
+        model->environment.activeBlocks = 20;
+        for (int i =0; i<4;i++){
+            model->player[i].playerSpeed = 8.0f;
+        }
+        model->environment.blockSpeed = 10;
     }
+    for (int i=0;i<4;i++)
+        {
+            handleCollision(&model->player[i], shipRect, model->environment.blockPositions, model->environment.activeBlocks);
+        }
 
-    handleCollision(model, shipRect, model->blockPositions, model->activeBlocks);
-
-    for (int i = 0; i < model->activeBlocks; i++) {
-        model->blockPositions[i].x -= model->blockSpeed;
-        if (model->blockPositions[i].x < -model->blockPositions[i].w) {
-            model->blockPositions[i].x = 1200;
-            model->blockPositions[i].y = rand() % (750 - model->blockPositions[i].h);
+    for (int i = 0; i < model->environment.activeBlocks; i++) {
+        model->environment.blockPositions[i].x -= model->environment.blockSpeed;
+        if (model->environment.blockPositions[i].x < -model->environment.blockPositions[i].w) {
+            model->environment.blockPositions[i].x = 1200;
+            model->environment.blockPositions[i].y = rand() % (750 - model->environment.blockPositions[i].h);
         }
     }
+
 }
 
 
@@ -94,103 +101,99 @@ int checkCollision(SDL_Rect* a, SDL_Rect* b) {
     return 1;
 }
 
-void handleCollision(GameModel* model, SDL_Rect shipRect, SDL_Rect* blockPositions, int numBlocks) {
+void handleCollision(Player* player, SDL_Rect shipRect, SDL_Rect* blockPositions, int numBlocks) {
     bool collisionDetected = false;
-    
-    if(!model->isImmortal) {
+    if(!player->isImmortal) {
         // Skip collision detection if immortal
         for (int i = 0; i < numBlocks; i++) {
-        if (checkCollision(&shipRect, &blockPositions[i])) {
-            if (!model->isImmortal) {  // Only process collision if not immortal
-                model->playerLife--; // Decrease life
-                if (model->playerLife == 0) {
-                    printf("Game Over\n");
-                    exit(0);
-                }
+            if (checkCollision(&shipRect, &blockPositions[i])) {
+                if (!player->isImmortal) {  // Only process collision if not immortal
+                    player->playerLife--; // Decrease life
+                    if (player->playerLife == 0) {
+                        printf("Game Over\n");
+                        exit(0);
+                    }
                 
-                // Set the player to be immortal for 2 seconds
-                model->isImmortal = true;
-                model->immortalStartTime = SDL_GetTicks();
-            }
+                    // Set the player to be immortal for 2 seconds
+                    player->isImmortal = true;
+                    player->immortalStartTime = SDL_GetTicks();
+                }
 
+                // Hantera kollision genom att stoppa spelarens rörelse eller justera position
+                // Exempel: Stoppa spelaren från att röra sig in i blocket
+                if (shipRect.y < blockPositions[i].y) {
+                    // Kollision underifrån
+                    player->y = blockPositions[i].y - shipRect.h;
+                    player->collisionDown = true;
+                } else if (shipRect.y > blockPositions[i].y) {
+                    // Kollision ovanifrån
+                    player->y = blockPositions[i].y + blockPositions[i].h;
+                    player->collisionUp = true;
+                }
 
-            // Hantera kollision genom att stoppa spelarens rörelse eller justera position
-            // Exempel: Stoppa spelaren från att röra sig in i blocket
-            if (shipRect.y < blockPositions[i].y) {
-                // Kollision underifrån
-                model->y = blockPositions[i].y - shipRect.h;
-                model->collisionDown = true;
-            } else if (shipRect.y > blockPositions[i].y) {
-                // Kollision ovanifrån
-                model->y = blockPositions[i].y + blockPositions[i].h;
-                model->collisionUp = true;
-            }
+                if (shipRect.x < blockPositions[i].x) {
+                    // Kollision till höger
+                    player->x = blockPositions[i].x - shipRect.w;
+                    player->collisionRight = true;
+                } else if (shipRect.x > blockPositions[i].x) {
+                    // Kollision till vänster
+                    player->x = blockPositions[i].x + blockPositions[i].w;
+                    player->collisionLeft = true;
+                }
 
-            if (shipRect.x < blockPositions[i].x) {
-                // Kollision till höger
-                model->x = blockPositions[i].x - shipRect.w;
-                model->collisionRight = true;
-            } else if (shipRect.x > blockPositions[i].x) {
-                // Kollision till vänster
-                model->x = blockPositions[i].x + blockPositions[i].w;
-                model->collisionLeft = true;
             }
-            
         }
-    }
     
     }
 
     if (!collisionDetected) {
-        model->collisionRight = false;
-        model->collisionLeft = false;
-        model->collisionUp = false;
-        model->collisionDown = false;
+        player->collisionRight = false;
+        player->collisionLeft = false;
+        player->collisionUp = false;
+        player->collisionDown = false;
     }
 }
 
 void updateGameState(GameModel* model) {
     updateCharacterPosition(model);
     Uint32 currentTime = SDL_GetTicks();
-    if (model->isImmortal && (currentTime - model->immortalStartTime >= 3000)) {
-        model->isImmortal = false;  // End immortality
+    for (int i=0;i<4;i++){
+        if (model->player[i].isImmortal && (currentTime - model->player[i].immortalStartTime >= 3000)) {
+            model->player[i].isImmortal = false;  // End immortality
+        }
     }
     // printa meddelande varje 4 sekunder
 
-    if(currentTime - model->lifeSpawnTime >= 4000){//ändra pos för life på interval
-        model->lifeActive = true;
-        model->lifePosX = rand() % WINDOW_WIDTH;
-        model->lifePosY = rand() % WINDOW_HEIGHT;
-        model->lifeSpawnTime = currentTime; 
+    if(currentTime - model->gameState.lifeSpawnTime >= 4000){//ändra pos för life på interval
+        model->gameState.lifeActive = true;
+        model->gameState.lifePosX = rand() % WINDOW_WIDTH;
+        model->gameState.lifePosY = rand() % WINDOW_HEIGHT;
+        model->gameState.lifeSpawnTime = currentTime;
     }
 
-    
     //Todo gör lifeActive till flase om spelaren kolliderar med den
-
 
     // Continue with other game updates
 }
 
 void updateCharacterPosition(GameModel* model) {
     // Update position based on velocity
-    model->x += model->velocityX;
-    model->y += model->velocityY;
+    for (int i=0;i<4;i++) {
+        model->player[i].x += model->player[i].velocityX;
+        model->player[i].y += model->player[i].velocityY;
 
-    // Clamp position to stay within the window
-    if (model->x < 0) {
-        model->x = 0;
-        model->collisionLeft = true;  // Optional: Set collision flag if needed
-    } else if (model->x > WINDOW_WIDTH - SHIP_WIDTH) {
-        model->x = WINDOW_WIDTH - SHIP_WIDTH;
-        model->collisionRight = true;  // Optional: Set collision flag if needed
-    }
+        // Clamp position to stay within the window
 
-    if (model->y < 0) {
-        model->y = WINDOW_HEIGHT - SHIP_HEIGHT - SHIP_HEIGHT;
-        model->collisionUp = true;  // Optional: Set collision flag if needed
-    } else if (model->y > WINDOW_HEIGHT - SHIP_HEIGHT - SHIP_HEIGHT) {
-        model->y = 0;
-        model->collisionDown = true;  // Optional: Set collision flag if needed
+        if (model->player[i].x < 0) {
+            model->player[i].x = 0;
+        } else if (model->player[i].x > WINDOW_WIDTH - SHIP_WIDTH) {
+            model->player[i].x = WINDOW_WIDTH - SHIP_WIDTH;
+        }
+        if (model->player[i].y < 0) {
+            model->player[i].y = 0;
+        } else if (model->player[i].y > WINDOW_HEIGHT - SHIP_HEIGHT - SHIP_HEIGHT-SHIP_HEIGHT/2.f) {
+            model->player[i].y = WINDOW_HEIGHT - SHIP_HEIGHT - SHIP_HEIGHT-SHIP_HEIGHT/2.f;
+        }
     }
 }
 

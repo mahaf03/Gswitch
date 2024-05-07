@@ -31,7 +31,10 @@ void renderMenu(SDL_Renderer **renderer, SDL_Window **window, SDL_Texture **back
     SDL_RenderCopy(*renderer, *exitTexture, NULL, &exitButtonRect);
     SDL_RenderPresent(*renderer);
 }
+//void gameView(SDL_Renderer **renderer, SDL_Window **window, SDL_Texture **texture, SDL_Texture **texture1, SDL_Texture **backgroundTexture, SDL_Texture **blockTexture)
+//void gameView(SDL_Renderer **renderer, SDL_Window **window, SDL_Texture **texture, SDL_Texture **backgroundTexture, SDL_Texture **blockTexture)
 void gameView(SDL_Renderer **renderer, SDL_Window **window, SDL_Texture **texture, SDL_Texture **texture1, SDL_Texture **backgroundTexture, SDL_Texture **blockTexture)
+
 {
     SDL_Surface *surface = IMG_Load("resources/austrounat.png");
     *texture = SDL_CreateTextureFromSurface(*renderer, surface);
@@ -45,7 +48,6 @@ void gameView(SDL_Renderer **renderer, SDL_Window **window, SDL_Texture **textur
     loadBackground(*renderer, backgroundTexture);
     loadBlock(*renderer, blockTexture);
 }
-
 void drawLives(SDL_Renderer *renderer, int lives, int x, int y)
 {
     int barWidth = 15;
@@ -82,34 +84,39 @@ void loadBlock(SDL_Renderer *renderer, SDL_Texture **blockTexture)
     *blockTexture = SDL_CreateTextureFromSurface(renderer, surface);
     SDL_FreeSurface(surface);
 }
-
 void renderView(SDL_Renderer *renderer, SDL_Texture *texture, SDL_Texture *texture1, SDL_Texture *backgroundTexture, SDL_Texture *blockTexture, GameModel *model, SDL_Rect shipRect)
 {
     SDL_RenderClear(renderer);
 
-    SDL_Texture *currentTexture = (model->currentPlayerImage == ASTRONAUT1) ? texture1 : texture;
+    SDL_Texture *currentTexture = (model->player[0].currentPlayerImage == ASTRONAUT1) ? texture1 : texture;
 
     if (backgroundTexture)
     {
         SDL_RenderCopy(renderer, backgroundTexture, NULL, NULL);
     }
 
-    SDL_RenderCopy(renderer, currentTexture, NULL, &shipRect);
-
-    for (int i = 0; i < model->activeBlocks; i++)
-    {
-        placeTile(renderer, blockTexture, model->blockPositions[i].x, model->blockPositions[i].y);
+    SDL_Rect shipRectPlayers[4];
+    for (int i = 0; i < 4; i++) {
+        SDL_Rect shipRectPlayersI = { (int)model->player[i].x, (int)model->player[i].y, 50, 50 };
+        shipRectPlayers[i] = shipRectPlayersI;
+        SDL_RenderCopy(renderer, currentTexture, NULL, &shipRectPlayers[i]);
     }
 
-    drawLives(renderer, model->playerLife, 10, 10); // Visa rektanglar som liv nedanför texten
+    SDL_RenderCopy(renderer, currentTexture, NULL, &shipRect);
+    for (int i = 0; i < model->environment.activeBlocks; i++)
+    {
+        //placeTile(renderer, texture, model->environment.blockPositions[i].x, model->environment.blockPositions[i].y);
+        placeTile(renderer, blockTexture, model->environment.blockPositions[i].x, model->environment.blockPositions[i].y);
+    }
 
-    if (model->lifeActive){
-        drawExtraLife(renderer, model->lifePosX, model->lifePosY);
+    drawLives(renderer, model->player[0].playerLife, 10, 10); // Visa rektanglar som liv nedanför texten
+
+    if (model->gameState.lifeActive){
+       drawExtraLife(renderer, model->gameState.lifePosX, model->gameState.lifePosY);
     }
 
     SDL_RenderPresent(renderer);
 }
-
 void closeView(SDL_Renderer *renderer, SDL_Window *window, SDL_Texture *shipTexture, SDL_Texture *backgroundTexture, SDL_Texture *blockTexture)
 {
     SDL_DestroyTexture(shipTexture);
@@ -128,12 +135,12 @@ void placeTile(SDL_Renderer *renderer, SDL_Texture *texture, int x, int y)
 void drawExtraLife(SDL_Renderer* renderer, int x, int y) {
     int barWidth = 15;
     SDL_Color color = {255, 0, 0};
-    printf("x: %d, y: %d\n", x, y);
+    //printf("x: %d, y: %d\n", x, y);
     SDL_Rect rect = {x, y, barWidth, 20};
     //SDL_Rect rect = {20, 20, 20, 20};
     SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, 255);
     SDL_RenderFillRect(renderer, &rect);
-    printf("Extra life\n");
+    //printf("Extra life\n");
     
 }
 

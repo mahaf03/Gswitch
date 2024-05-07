@@ -5,8 +5,8 @@
 #include <SDL2/SDL.h>
 #include "GameModel.h"
 
-void handleEvent(SDL_Event* event, GameModel* model, bool* closeWindow);
-void updateModel(GameModel* model);
-void stopModel(GameModel* model, int collision);
+void handleEvent(SDL_Event* event, Player* player, bool* closeWindow);
+void updatePlayer(Player* player);
+void stopPlayer(Player* player, int direction);
 
 #endif

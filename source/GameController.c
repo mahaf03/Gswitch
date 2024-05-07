@@ -1,43 +1,37 @@
 // GameController.c
 #include "GameController.h"
 
-void handleEvent(SDL_Event* event, GameModel* model, bool* closeWindow) {
+void handleEvent(SDL_Event* event, Player* player, bool* closeWindow) {
     switch (event->type) {
         case SDL_QUIT:
             *closeWindow = true;
             break;
+
         case SDL_KEYDOWN:
             switch (event->key.keysym.scancode) {
                 case SDL_SCANCODE_W:
                 case SDL_SCANCODE_UP:
-                    if(!model->collisionUp){
-                        model->up = true;
-                        model->currentPlayerImage = ASTRONAUT1;
-                        break;
+                    if(!player->collisionUp){
+                          player->up = true;
                     }
                     break;
+                    
                 case SDL_SCANCODE_A:
                 case SDL_SCANCODE_LEFT:
-                    if(!model->collisionLeft){
-                        model->left = true;
-                        model->currentPlayerImage = ASTRONAUT1;
-                        break;
+                    if(!player->collisionLeft){
+                        player->left = true;
                     }
                     break;
-                case SDL_SCANCODE_S:
-                case SDL_SCANCODE_DOWN:
-                    if(!model->collisionDown){
-                        model->down = true;
-                        model->currentPlayerImage = ASTRONAUT;                     
-                        break;
+            case SDL_SCANCODE_S:
+            case SDL_SCANCODE_DOWN:
+                    if(!player->collisionDown){
+                        player->down = true;
                     }
                     break;
                 case SDL_SCANCODE_D:
                 case SDL_SCANCODE_RIGHT:
-                    if(!model->collisionRight){
-                        model->right = true;
-                        model->currentPlayerImage = ASTRONAUT1;
-                        break;
+                    if(!player->collisionRight){
+                        player->right = true;
                     }
                     break;
             }
@@ -46,89 +40,78 @@ void handleEvent(SDL_Event* event, GameModel* model, bool* closeWindow) {
             switch (event->key.keysym.scancode) {
                 case SDL_SCANCODE_W:
                 case SDL_SCANCODE_UP:
-                    model->up = false;
+                    player->up = false;
                     break;
                 case SDL_SCANCODE_A:
                 case SDL_SCANCODE_LEFT:
-                    model->left = false;
+                    player->left = false;
                     break;
                 case SDL_SCANCODE_S:
                 case SDL_SCANCODE_DOWN:
-                    model->down = false;
+                    player->down = false;
                     break;
                 case SDL_SCANCODE_D:
                 case SDL_SCANCODE_RIGHT:
-                    model->right = false;
+                    player->right = false;
                     break;
             }
             break;
     }
 }
-void applyGravity(GameModel* model) {
-    printf("xxxxxxx %d \n", model->gravityDelayTimer);
-    const float gravity = 1.5f;
-    const int delayFrames = 30; // This is approximately half a second if running at 60 fps
-
-    // Initialize the timer if the model starts moving up
-    if (model->up && !model->collisionUp && model->gravityDelayTimer == 0) {
-        model->gravityDelayTimer = delayFrames;
-    }
-
-    // Count down the timer if it's above zero
-    if (model->gravityDelayTimer > 0) {
-        model->gravityDelayTimer--;
-    }
-
-    // Apply gravity only if the timer is zero and there is no collision below
-    if (model->gravityDelayTimer == 0 && !model->collisionDown) {
-        model->velocityY += gravity;
+void applyGravity(Player* player) {
+    const float gravity = 3.0f;  
+    for(int i = 0; i < 4; i++){
+        if (!player->collisionDown) {
+            player->velocityY += gravity;
+        }
     }
 }
 
-void updateModel(GameModel* model) {
+void updatePlayer(Player* player) {
     //const float speed = 7.0f;
-    model->velocityX = model->velocityY = 0;
+    
+    player->velocityX = player->velocityY = 0;
 
-     applyGravity(model);
+     applyGravity(player);
 
-    if (model->up && !model->down && !model->collisionUp) model->velocityY = -model->playerSpeed;
-    if (model->down && !model->up && !model->collisionDown) model->velocityY = model->playerSpeed;
+    if (player->up && !player->down && !player->collisionUp) player->velocityY = -player->playerSpeed;
+    if (player->down && !player->up && !player->collisionDown) player->velocityY = player->playerSpeed;
 
-    if (model->left && !model->right && !model->collisionLeft) model->velocityX = -model->playerSpeed;
-    if (model->right && !model->left && !model->collisionRight) model->velocityX = model->playerSpeed; // Prevent right movement if collision on the right
+    if (player->left && !player->right && !player->collisionLeft) player->velocityX = -player->playerSpeed;
+    if (player->right && !player->left && !player->collisionRight) player->velocityX = player->playerSpeed; // Prevent right movement if collision on the right
 
     //if(check(model(x+1)))
-    model->x += model->velocityX;
-    model->y += model->velocityY;
+    player->x += player->velocityX;
+    player->y += player->velocityY;
 
 }
 
-void stopModel(GameModel* model, int direction) {
+void stopPlayer(Player* player, int direction) {
     if(direction == 1){
-        model->velocityX = 0;
-        model->left = model->right = false;
-        model->collisionRight = true;
+        player->velocityX = 0;
+        player->left = player->right = false;
+        player->collisionRight = true;
     }
     if(direction == 2){
-        model->velocityX = 0;
-        model->left = model->right = false;
-        model->collisionLeft = true;
+        player->velocityX = 0;
+        player->left = player->right = false;
+        player->collisionLeft = true;
     }
     if(direction == 3){
-        model->velocityY = 0;
-        model->up = model->down = false;
-        model->collisionUp = true;
+        player->velocityY = 0;
+        player->up = player->down = false;
+        player->collisionUp = true;
     }
     if(direction == 4){
-        model->velocityY = 0;
-        model->up = model->down = false;
-        model->collisionDown = true;
+        player->velocityY = 0;
+        player->up = player->down = false;
+        player->collisionDown = true;
     }
     if(direction == 0){
-        model->collisionRight = false;
-        model->collisionLeft = false;
-        model->collisionUp = false;
-        model->collisionDown = false;
+        player->collisionRight = false;
+        player->collisionLeft = false;
+        player->collisionUp = false;
+        player->collisionDown = false;
     }
 
 }
