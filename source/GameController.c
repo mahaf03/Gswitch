@@ -58,21 +58,21 @@ void handleEvent(SDL_Event* event, Player* player, bool* closeWindow) {
             break;
     }
 }
-void applyGravity(Player* player) {
-    const float gravity = 3.0f;  
-    for(int i = 0; i < 4; i++){
-        if (!player->collisionDown) {
-            player->velocityY += gravity;
-        }
-    }
-}
+// void applyGravity(Player* player) {
+//     const float gravity = 1.0f;  
+//     for(int i = 0; i < 4; i++){
+//         if (!player->collisionDown) {
+//             player->velocityY += gravity;
+//         }
+//     }
+// }
 
 void updatePlayer(Player* player) {
     //const float speed = 7.0f;
     
     player->velocityX = player->velocityY = 0;
 
-     applyGravity(player);
+    //  applyGravity(player);
 
     if (player->up && !player->down && !player->collisionUp) player->velocityY = -player->playerSpeed;
     if (player->down && !player->up && !player->collisionDown) player->velocityY = player->playerSpeed;
