@@ -175,7 +175,7 @@ int main(int argv, char **args)
             frameTime = SDL_GetTicks() - frameStart; // Hur länge det tog att processa ramen
             udpDataToClient message;
             IPaddress addrr = clientReceivePacket(&message, &sd);
-            clientReceivePacket(&message, &sd);
+            //clientReceivePacket(&message, &sd);
             if (addrr.host != 0 && addrr.port != 0) // har vi tagit emot något??
                 {
                     printf("new message from %x:\n", addrr.host);
