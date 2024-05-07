@@ -23,6 +23,7 @@ void initializeModel(GameModel* model) {
             model->player[i].isImmortal = false;  // Initially not immortal
             model->player[i].immortalStartTime = 0;  // Reset time
             model->player[i].playerLife = 5;
+            model ->player[i].playerID = -1;
         }
             model->environment.blockSpeed = 5;
             model->environment.activeBlocks = 5; // Startar med 5 block

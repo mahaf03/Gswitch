@@ -8,12 +8,12 @@
 #include "Network.h"
 
 typedef enum
-{
-    Menu,
-    Game,
-    MusicOn,
-    MusicOff
-} GameStates;
+    {
+        Menu,
+        Game,
+        MusicOn,
+        MusicOff
+    } GameStates;
 
 int main(int argv, char **args)
 {
@@ -39,25 +39,20 @@ int main(int argv, char **args)
     SDL_Rect MuteButtonRect = {500, 430, 150, 150}; // Positionerad under "Continue" knappen med 50 pixels mellanrum
 
     initializeModel(&model);
-    for (int i=0; i<4;i++)
-        {
-            strcpy(model.player[i].playerName,"");
-        }
-    strcpy(model.player[0].playerName,*args);
 
     bool success = true;
     if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0)
-    {
-        printf("SDL_mixer could not initialize! SDL_mixer Error: %s\n", Mix_GetError());
-        success = false;
-    }
+        {
+            printf("SDL_mixer could not initialize! SDL_mixer Error: %s\n", Mix_GetError());
+            success = false;
+        }
 
     Mix_Music *backgroundMusic = Mix_LoadMUS("resources/music2.mp3");
     if (backgroundMusic == NULL)
-    {
-        printf("Failed to load background music! SDL_mixer Error: %s\n", Mix_GetError());
-        success = false;
-    }
+        {
+            printf("Failed to load background music! SDL_mixer Error: %s\n", Mix_GetError());
+            success = false;
+        }
 
     // Spela musik
     Mix_PlayMusic(backgroundMusic, -1); // Sista argumentet är antalet repetitioner (-1 för oändlig loop)
@@ -79,18 +74,6 @@ int main(int argv, char **args)
     initNetwork_Client(&sd, &srvadd, pReceive);
     printf("Network initialized!\n");
     // Allocate memory for UDP packets
-    if (!(p = SDLNet_AllocPacket(512)))
-    {
-        fprintf(stderr, "SDLNet_AllocPacket: %s\n", SDLNet_GetError());
-        exit(EXIT_FAILURE);
-    }
-
-    if (!((pReceive = SDLNet_AllocPacket(512))))
-    {
-        fprintf(stderr, "SDLNet_AllocPacket: %s\n", SDLNet_GetError());
-        exit(EXIT_FAILURE);
-    }
-
     bool closeWindow = false;
     GameStates currentMusicState = MusicOn;
     GameStates currentState = Menu;
@@ -98,146 +81,135 @@ int main(int argv, char **args)
     float prePosX = model.player[0].x;
     float prePosY = model.player[0].y;
     while (!closeWindow)
-    {
-        frameStart = SDL_GetTicks();
-
-        SDL_Event event;
-        while (SDL_PollEvent(&event))
         {
-            if (event.type == SDL_QUIT)
-            {
-                closeWindow = true;
-            }
-            else if (event.type == SDL_MOUSEBUTTONDOWN)
-            {
-                int mouseX, mouseY;
-                SDL_GetMouseState(&mouseX, &mouseY);
-                if (currentState == Menu)
-                {
-                    if (mouseX >= continueButtonRect.x && mouseX <= continueButtonRect.x + continueButtonRect.w &&
-                        mouseY >= continueButtonRect.y && mouseY <= continueButtonRect.y + continueButtonRect.h)
-                    {
-                        printf("Pressed continue button\n");
-                        gameView(&renderer, &window, &texture, &bgTexture, &blockTexture);
-                        currentState = Game;
-                    }
-                    else if (mouseX >= exitButtonRect.x && mouseX <= exitButtonRect.x + exitButtonRect.w &&
-                             mouseY >= exitButtonRect.y && mouseY <= exitButtonRect.y + exitButtonRect.h)
-                    {
-                        printf("Pressed exit button\n");
-                        closeWindow = true;
-                    }
-                    else if (mouseX >= volumeButtonRect.x && mouseX <= volumeButtonRect.x + volumeButtonRect.w &&
-                             mouseY >= volumeButtonRect.y && mouseY <= volumeButtonRect.y + volumeButtonRect.h)
-                    {
-                        if (currentMusicState == MusicOn)
-                        {
-                            Mix_PauseMusic();
-                            currentMusicState = MusicOff;
+            frameStart = SDL_GetTicks();
 
+            SDL_Event event;
+            while (SDL_PollEvent(&event))
+                {
+                    if (event.type == SDL_QUIT)
+                        {
+                            closeWindow = true;
                         }
-                        else
+                    else if (event.type == SDL_MOUSEBUTTONDOWN)
                         {
-                            Mix_ResumeMusic();
-                            currentMusicState = MusicOn;
+                            int mouseX, mouseY;
+                            SDL_GetMouseState(&mouseX, &mouseY);
+                            if (currentState == Menu)
+                                {
+                                    if (mouseX >= continueButtonRect.x && mouseX <= continueButtonRect.x + continueButtonRect.w &&
+                                        mouseY >= continueButtonRect.y && mouseY <= continueButtonRect.y + continueButtonRect.h)
+                                        {
+                                            printf("Pressed continue button\n");
+                                            gameView(&renderer, &window, &texture, &bgTexture, &blockTexture);
+                                            currentState = Game;
+                                        }
+                                    else if (mouseX >= exitButtonRect.x && mouseX <= exitButtonRect.x + exitButtonRect.w &&
+                                             mouseY >= exitButtonRect.y && mouseY <= exitButtonRect.y + exitButtonRect.h)
+                                        {
+                                            printf("Pressed exit button\n");
+                                            closeWindow = true;
+                                        }
+                                    else if (mouseX >= volumeButtonRect.x && mouseX <= volumeButtonRect.x + volumeButtonRect.w &&
+                                             mouseY >= volumeButtonRect.y && mouseY <= volumeButtonRect.y + volumeButtonRect.h)
+                                        {
+                                            if (currentMusicState == MusicOn)
+                                                {
+                                                    Mix_PauseMusic();
+                                                    currentMusicState = MusicOff;
+
+                                                }
+                                            else
+                                                {
+                                                    Mix_ResumeMusic();
+                                                    currentMusicState = MusicOn;
+                                                }
+                                        }
+                                }
                         }
-                    }
-                }
-            }
-            if (currentState == Game)
-            {
-                handleEvent(&event, &model.player[0], &closeWindow);
-            }
-        }
-        if (currentState == Menu)
-        {
-            // Rendera menyn
-            renderMenu(&renderer, &window, &bgTexture, &continueTexture, &exitTexture, continueButtonRect, exitButtonRect, volumeButtonRect, &volumeTexture);
-        }
-        else if (currentState == Game)
-        {
-            // Uppdatera och rendera spelet
-            SDL_DestroyTexture(continueTexture);
-            SDL_DestroyTexture(exitTexture);
-
-            //Move players
-            for(int i = 0; i < 4; i++){
-                SDL_Rect shipRect = {(int)model.player[i].x, (int)model.player[i].y, 50, 50};
-                updatePlayer(&model.player[i]);
-            }
-
-
-            /*NETWORKING*/
-            const float THRESHOLD = 5.f;
-            float diffX = prePosX - model.player[0].x;
-            float diffY = prePosY - model.player[0].y;
-            float squarediff = diffX*diffX + diffY*diffY;
-            if( 1/invSqrt(squarediff) > THRESHOLD)
-                {
-                    //Send data to server
-                    udpDataToServer testdata = {model.player[0], 0};
-                    clientSendPacket(testdata, &srvadd, &sd);
-
-                    /*utskrift*/
-                  prePosX = model.player[0].x;
-                   prePosY = model.player[0].y;
-                    //printf("sent data to server \n\tx: %f\n\ty: %f\n",prePosX,prePosY);
-                }
-
-            SDL_Rect shipRect = {(int)model.player[0].x, (int)model.player[0].y, 50, 50};
-            //updateBlocks(&model, shipRect);
-            updateGameState(&model);
-            // if move, then send to server.
-            renderView(renderer, texture, bgTexture, blockTexture, &model, &model.player[0], shipRect);
-        }
-
-        frameTime = SDL_GetTicks() - frameStart; // Hur länge det tog att processa ramen
-        udpDataToClient message;
-        IPaddress addrr = clientReceivePacket(&message, &sd);
-        clientReceivePacket(&message, &sd);
-        if (addrr.host != 0 && addrr.port != 0) // har vi tagit emot något??
-        {
-            printf("new message from %x:\n", addrr.host);
-            printf("\tx:\t%f\n\ty:\t%f\n}",message.player.x,message.player.y);
-            for (int i=0 ;i<4;i++)
-                {
-                    if (strcmp(model.player[i].playerName,message.player.playerName) || strcmp(model.player[i].playerName,"") )
+                    if (currentState == Game)
                         {
-                            model.player[i] =  message.player;
-                            model.player[i].velocityX = 0.f;
-                            model.player[i].velocityY = 0.f;
-                            model.player[i].up= 0;
-                            model.player[i].down= 0;
-                            model.player[i].right= 0;
-                            model.player[i].left= 0;
-                            break;
+                            handleEvent(&event, &model.player[0], &closeWindow);
                         }
                 }
+            if (currentState == Menu)
+                {
+                    // Rendera menyn
+                    renderMenu(&renderer, &window, &bgTexture, &continueTexture, &exitTexture, continueButtonRect, exitButtonRect, volumeButtonRect, &volumeTexture);
+                }
+            else if (currentState == Game)
+                {
+                    // Uppdatera och rendera spelet
+                    SDL_DestroyTexture(continueTexture);
+                    SDL_DestroyTexture(exitTexture);
 
-            /*
-            //playercount = message.playercount;
-            for (int i = 1; i <= message.playercount; i++)
-            {
-                printf("\tplayer %d at %f %f\n", i, message.playerPositions[i].x, message.playerPositions[i].y);
-                model.player[i].x = message.playerPositions[i].x;
-                model.player[i].y = message.playerPositions[i].y;
-            }
-            */
-        }
-        /*
-          for (int i = 0; i < playercount; i++)
-        {
-            model.player[i].x = message.playerPositions[i].x;
-            model.player[i].y = message.playerPositions[i].y;
-            updatePlayer(&model.player[i]);
-        }
-        */
+                    //Move players
+                    for(int i = 0; i < 4; i++){
+                        SDL_Rect shipRect = {(int)model.player[i].x, (int)model.player[i].y, 50, 50};
+                        updatePlayer(&model.player[i]);
+                    }
 
-        if (frameDelay > frameTime)
-        {
-            SDL_Delay(frameDelay - frameTime);
+
+                    /*NETWORKING*/
+                    const float THRESHOLD = 5.f;
+                    float diffX = prePosX - model.player[0].x;
+                    float diffY = prePosY - model.player[0].y;
+                    float squarediff = diffX*diffX + diffY*diffY;
+                    if( 1/invSqrt(squarediff) > THRESHOLD)
+                        {
+                            //Send data to server
+                            udpDataToServer testdata = {model.player[0], 0};
+                            clientSendPacket(testdata, &srvadd, &sd);
+
+                            /*utskrift*/
+                            prePosX = model.player[0].x;
+                            prePosY = model.player[0].y;
+                            //printf("sent data to server \n\tx: %f\n\ty: %f\n",prePosX,prePosY);
+                        }
+
+                    SDL_Rect shipRect = {(int)model.player[0].x, (int)model.player[0].y, 50, 50};
+                    //updateBlocks(&model, shipRect);
+                    updateGameState(&model);
+                    // if move, then send to server.
+                    renderView(renderer, texture, bgTexture, blockTexture, &model, &model.player[0], shipRect);
+                }
+
+            frameTime = SDL_GetTicks() - frameStart; // Hur länge det tog att processa ramen
+            udpDataToClient message;
+            IPaddress addrr = clientReceivePacket(&message, &sd);
+            clientReceivePacket(&message, &sd);
+            if (addrr.host != 0 && addrr.port != 0) // har vi tagit emot något??
+                {
+                    printf("new message from %x:\n", addrr.host);
+                    printf("\tx:\t%f\n\ty:\t%f\n}",message.player.x,message.player.y);
+                    model.player[0].playerID = message.clientId; //assign this clients playerID
+                    for (int i =0;i<4;i++)
+                        {
+                            if (message.player.playerID == model.player[0].playerID)
+                                {
+                                    //this is our message resent back to us by the server
+                                    break;
+                                }
+
+                            if(model.player[i].playerID ==-1)
+                                {
+                                    //previously unknown player
+                                    model.player[i].playerID = message.player.playerID;
+                                }
+                            if (model.player[i].playerID == message.player.playerID)
+                                {
+                                    model.player[i].x = message.player.x;
+                                    model.player[i].y = message.player.y;
+                                    break;
+                                }
+                        }
+                }
+
+            if (frameDelay > frameTime)
+                {
+                    SDL_Delay(frameDelay - frameTime);
+                }
         }
-    }
 
     Mix_FreeMusic(backgroundMusic); // För musik
     backgroundMusic = NULL;
