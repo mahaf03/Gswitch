@@ -149,9 +149,12 @@ int main(int argv, char **args)
                         updatePlayer(&model.player[i]);
                     }
 
+                    SDL_Rect shipRect = {(int)model.player[0].x, (int)model.player[0].y, 50, 50};
+                    updateBlocks(&model, shipRect);
+                    updateGameState(&model);
 
                     /*NETWORKING*/
-                    const float THRESHOLD = 5.f;
+                    const float THRESHOLD = 1.f;
                     float diffX = prePosX - model.player[0].x;
                     float diffY = prePosY - model.player[0].y;
                     float squarediff = diffX*diffX + diffY*diffY;
@@ -161,15 +164,10 @@ int main(int argv, char **args)
                             udpDataToServer testdata = {model.player[0], 0};
                             clientSendPacket(testdata, &srvadd, &sd);
 
-                            /*utskrift*/
                             prePosX = model.player[0].x;
                             prePosY = model.player[0].y;
                             //printf("sent data to server \n\tx: %f\n\ty: %f\n",prePosX,prePosY);
                         }
-
-                    SDL_Rect shipRect = {(int)model.player[0].x, (int)model.player[0].y, 50, 50};
-                    updateBlocks(&model, shipRect);
-                    updateGameState(&model);
                     // if move, then send to server.
                     renderView(renderer, texture,texture1, bgTexture, blockTexture, &model, shipRect);
                 }

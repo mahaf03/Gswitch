@@ -33,6 +33,6 @@ IPaddress serverReceivePacket(udpDataToServer* packet, UDPsocket* sd);
 void serverSendPacket(udpDataToClient Data, IPaddress* destAddr, UDPsocket* sd);
 void clientSendPacket(udpDataToServer Data, IPaddress* destAddr, UDPsocket* sd);
 IPaddress clientReceivePacket(udpDataToClient* packet, UDPsocket* sd);
-
 float invSqrt( float number );
+
 #endif
