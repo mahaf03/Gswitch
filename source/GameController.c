@@ -13,6 +13,7 @@ void handleEvent(SDL_Event* event, Player* player, bool* closeWindow) {
                 case SDL_SCANCODE_UP:
                     if(!player->collisionUp){
                           player->up = true;
+                          player->currentPlayerImage = ASTRONAUT1;
                     }
                     break;
                     
@@ -20,18 +21,21 @@ void handleEvent(SDL_Event* event, Player* player, bool* closeWindow) {
                 case SDL_SCANCODE_LEFT:
                     if(!player->collisionLeft){
                         player->left = true;
+                        player->currentPlayerImage = ASTRONAUT1;
                     }
                     break;
             case SDL_SCANCODE_S:
             case SDL_SCANCODE_DOWN:
                     if(!player->collisionDown){
                         player->down = true;
+                        player->currentPlayerImage = ASTRONAUT;
                     }
                     break;
                 case SDL_SCANCODE_D:
                 case SDL_SCANCODE_RIGHT:
                     if(!player->collisionRight){
                         player->right = true;
+                        player->currentPlayerImage = ASTRONAUT1;
                     }
                     break;
             }
@@ -41,10 +45,12 @@ void handleEvent(SDL_Event* event, Player* player, bool* closeWindow) {
                 case SDL_SCANCODE_W:
                 case SDL_SCANCODE_UP:
                     player->up = false;
+                    player->currentPlayerImage = ASTRONAUT;
                     break;
                 case SDL_SCANCODE_A:
                 case SDL_SCANCODE_LEFT:
                     player->left = false;
+                    player->currentPlayerImage = ASTRONAUT;
                     break;
                 case SDL_SCANCODE_S:
                 case SDL_SCANCODE_DOWN:
@@ -53,6 +59,7 @@ void handleEvent(SDL_Event* event, Player* player, bool* closeWindow) {
                 case SDL_SCANCODE_D:
                 case SDL_SCANCODE_RIGHT:
                     player->right = false;
+                    player->currentPlayerImage = ASTRONAUT;
                     break;
             }
             break;
