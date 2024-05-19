@@ -44,7 +44,7 @@ int main(int argc, char **argv)
         {
           // the message is from a not already connected player
           playercount++;
-          if (playercount == 4)
+          if (playercount == 1)
           {
             fourPlayers = true;
             dataSend.status = 1; // En statusflagga som indikerar att spelet har startat

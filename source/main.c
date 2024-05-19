@@ -143,38 +143,53 @@ int main(int argv, char **args)
                         }
                     }
                 }
-            }
-            if (currentState == Game)
-            {
-                handleEvent(&event, &model.player[0], &closeWindow);
+                if (currentState == Game)
+                {
+                    handleEvent(&event, &model.player[0], &closeWindow);
+                }
             }
         }
+
         if (currentState == Menu)
         {
-            // Rendera menyn
-
             renderMenu(&renderer, &window, &bgTexture, &continueTexture, &exitTexture, continueButtonRect, exitButtonRect, volumeButtonRect, &volumeTexture);
         }
         else if (currentState == waitForPlayers)
         {
-            // Rendera vänta på spelare-skärmen
             renderWaitForPlayers(&renderer, &window, &bgTexture);
-            // Kolla om vi har fått tillräckligt med spelare
-            if (playercount >= 2 && fourPlayers == true)
+
+            // Check network messages
+            udpDataToClient message;
+            IPaddress addrr = clientReceivePacket(&message, &sd);
+            if (addrr.host != 0 && addrr.port != 0)
             {
-                currentState = Game;
+                if (message.status == 1)
+                {
+                    currentState = Game;
+                    printf("Game starting with 4 players!\n");
+                }
+                else
+                {
+                    // Update player positions
+                    for (int i = 0; i < 4; i++)
+                    {
+                        if (message.player.playerID == model.player[i].playerID)
+                        {
+                            model.player[i].x = message.player.x;
+                            model.player[i].y = message.player.y;
+                            break;
+                        }
+                    }
+                }
             }
         }
-
         else if (!model.alive)
         {
             printf("Player is dead\n");
 
-            // Visa "You Died"-skärmen permanent
             loadYouDiedTexture(renderer, &youDiedTexture);
             renderYouDied(&renderer, &window, &youDiedTexture);
 
-            // Fortsätt rendera "You Died"-skärmen tills användaren stänger fönstret
             while (!closeWindow)
             {
                 while (SDL_PollEvent(&event))
@@ -185,18 +200,14 @@ int main(int argv, char **args)
                     }
                 }
                 SDL_RenderClear(renderer);
-                // renderYouDied(&renderer, &window, &youDiedTexture);
-                SDL_Delay(100); // Liten fördröjning för att undvika hög CPU-användning
+                SDL_Delay(100);
             }
         }
-
         else if (currentState == Game)
         {
-            // Uppdatera och rendera spelet
             SDL_DestroyTexture(continueTexture);
             SDL_DestroyTexture(exitTexture);
 
-            // Move players
             for (int i = 0; i < 4; i++)
             {
                 SDL_Rect shipRect = {(int)model.player[i].x, (int)model.player[i].y, 50, 50};
@@ -207,66 +218,33 @@ int main(int argv, char **args)
             updateBlocks(&model, shipRect);
             updateGameState(&model);
 
-            /*NETWORKING*/
             const float THRESHOLD = 1.f;
             float diffX = prePosX - model.player[0].x;
             float diffY = prePosY - model.player[0].y;
             float squarediff = diffX * diffX + diffY * diffY;
             if (1 / invSqrt(squarediff) > THRESHOLD)
             {
-                // Send data to server
                 udpDataToServer testdata = {model.player[0], 0};
                 clientSendPacket(testdata, &srvadd, &sd);
 
                 prePosX = model.player[0].x;
                 prePosY = model.player[0].y;
-                // printf("sent data to server \n\tx: %f\n\ty: %f\n",prePosX,prePosY);
             }
-            // if move, then send to server.
+
             renderView(renderer, texture, texture1, bgTexture, blockTexture, &model, shipRect, youDiedTexture);
         }
 
-        frameTime = SDL_GetTicks() - frameStart; // Hur länge det tog att processa ramen
-        udpDataToClient message;
-        IPaddress addrr = clientReceivePacket(&message, &sd);
-        // clientReceivePacket(&message, &sd);
-        if (addrr.host != 0 && addrr.port != 0) // har vi tagit emot något??
-        {
-            printf("new message from %x:\n", addrr.host);
-            printf("\tx:\t%f\n\ty:\t%f\n}", message.player.x, message.player.y);
-            model.player[0].playerID = message.clientId; // assign this clients playerID
-            for (int i = 0; i < 4; i++)
-            {
-                if (message.player.playerID == model.player[0].playerID)
-                {
-                    // this is our message resent back to us by the server
-                    break;
-                }
-
-                if (model.player[i].playerID == -1)
-                {
-                    // previously unknown player
-                    model.player[i].playerID = message.player.playerID;
-                }
-                if (model.player[i].playerID == message.player.playerID)
-                {
-                    model.player[i].x = message.player.x;
-                    model.player[i].y = message.player.y;
-                    break;
-                }
-            }
-        }
-
+        frameTime = SDL_GetTicks() - frameStart;
         if (frameDelay > frameTime)
         {
             SDL_Delay(frameDelay - frameTime);
         }
     }
 
-    Mix_FreeMusic(backgroundMusic); // För musik
+    Mix_FreeMusic(backgroundMusic);
     backgroundMusic = NULL;
 
-    Mix_CloseAudio(); // Vid avslutning av programmet
+    Mix_CloseAudio();
 
     closeView(renderer, window, texture, bgTexture, blockTexture);
     SDL_Quit();

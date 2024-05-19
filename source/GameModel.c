@@ -71,7 +71,7 @@ void updateBlocks(GameModel *model, SDL_Rect shipRect)
     }
     for (int i = 0; i < 4; i++)
     {
-        handleCollision(&model->player[i], shipRect, model->environment.blockPositions, model->environment.activeBlocks, &model->gameState, model);
+        handleCollision(&model->player[i], shipRect, model->environment.blockPositions, model->environment.activeBlocks, model);
     }
 
     for (int i = 0; i < model->environment.activeBlocks; i++)
@@ -113,7 +113,7 @@ int checkCollision(SDL_Rect *a, SDL_Rect *b)
     return 1;
 }
 
-void handleCollision(Player *player, SDL_Rect shipRect, SDL_Rect *blockPositions, int numBlocks, GameWindowState *gameState, GameModel *model)
+void handleCollision(Player *player, SDL_Rect shipRect, SDL_Rect *blockPositions, int numBlocks, GameModel *model)
 {
     bool collisionDetected = false;
     if (!player->isImmortal)
