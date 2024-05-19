@@ -6,6 +6,17 @@
 #include <SDL2/SDL.h>
 #include <string.h>
 
+typedef enum
+{
+    Menu,
+    Game,
+    MusicOn,
+    MusicOff,
+    YouDied,
+    waitForPlayers, 
+} GameWindowState;
+
+
 typedef enum {
     ASTRONAUT,
     ASTRONAUT1
@@ -44,12 +55,13 @@ typedef struct {
     Player player[4];
     Environment environment;
     GameState gameState;
+    bool alive;
 } GameModel;
 
 void initializeModel(GameModel* model);
 int min(int a, int b);
 int checkCollision(SDL_Rect *shipRect, SDL_Rect *blockRect);
-void handleCollision(Player* player, SDL_Rect shipRect, SDL_Rect* blockPositions, int numBlocks);
+void handleCollision(Player *player, SDL_Rect shipRect, SDL_Rect *blockPositions, int numBlocks, GameWindowState *gameState, GameModel *model);
 //void handleCollision(GameModel* model, SDL_Rect shipRect, SDL_Rect* blockPositions, int numBlocks);
 void updateBlocks(GameModel* model, SDL_Rect shipRect);
 void updateGameState(GameModel* model);

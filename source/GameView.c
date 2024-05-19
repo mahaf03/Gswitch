@@ -4,7 +4,7 @@
 #include <stdbool.h>
 #include "GameController.h"
 #include "GameModel.h"
-void menuView(SDL_Renderer **renderer, SDL_Window **window, SDL_Texture **backgroundTexture, SDL_Texture **continueTexture, SDL_Texture **exitTexture, SDL_Texture **volumeTexture)
+void menuView(SDL_Renderer **renderer, SDL_Window **window, SDL_Texture **backgroundTexture, SDL_Texture **continueTexture, SDL_Texture **exitTexture, SDL_Texture **volumeTexture, SDL_Texture **youDiedTexture)
 {
     SDL_Surface *surface = IMG_Load("resources/background.png");
     *backgroundTexture = SDL_CreateTextureFromSurface(*renderer, surface);
@@ -20,8 +20,9 @@ void menuView(SDL_Renderer **renderer, SDL_Window **window, SDL_Texture **backgr
 
     SDL_Surface *volumeSurface = IMG_Load("resources/unmute.png");
     *volumeTexture = SDL_CreateTextureFromSurface(*renderer, volumeSurface);
-    SDL_FreeSurface(volumeSurface); // Korrekt frigör ytan
+    SDL_FreeSurface(volumeSurface); // Korrekt frigör ytan    
 }
+
 void renderMenu(SDL_Renderer **renderer, SDL_Window **window, SDL_Texture **backgroundTexture, SDL_Texture **continueTexture, SDL_Texture **exitTexture, SDL_Rect continueButtonRect, SDL_Rect exitButtonRect, SDL_Rect volumeButtonRect, SDL_Texture **volumeTexture)
 {
     SDL_RenderClear(*renderer);
@@ -31,8 +32,39 @@ void renderMenu(SDL_Renderer **renderer, SDL_Window **window, SDL_Texture **back
     SDL_RenderCopy(*renderer, *exitTexture, NULL, &exitButtonRect);
     SDL_RenderPresent(*renderer);
 }
-//void gameView(SDL_Renderer **renderer, SDL_Window **window, SDL_Texture **texture, SDL_Texture **texture1, SDL_Texture **backgroundTexture, SDL_Texture **blockTexture)
-//void gameView(SDL_Renderer **renderer, SDL_Window **window, SDL_Texture **texture, SDL_Texture **backgroundTexture, SDL_Texture **blockTexture)
+// Render you died screen
+
+void loadYouDiedTexture(SDL_Renderer *renderer, SDL_Texture **youDiedTexture)
+{
+    SDL_Surface *surface = IMG_Load("resources/youdied.png");
+    if (!surface)
+    {
+        printf("Unable to load you died image: %s\n", IMG_GetError());
+        *youDiedTexture = NULL;
+        return;
+    }
+    printf("You Died Texture loaded successfully\n");
+    *youDiedTexture = SDL_CreateTextureFromSurface(renderer, surface);
+    SDL_FreeSurface(surface);
+}
+
+
+
+void renderYouDied(SDL_Renderer **renderer, SDL_Window **window, SDL_Texture **youDiedTexture)
+{
+    if (*youDiedTexture == NULL)
+    {
+        printf("You Died texture is NULL\n");
+        return;
+    }
+    
+    SDL_RenderClear(*renderer);
+    SDL_RenderCopy(*renderer, *youDiedTexture, NULL, NULL);
+    SDL_RenderPresent(*renderer);
+    printf("Rendered You Died texture\n");
+}
+
+
 void gameView(SDL_Renderer **renderer, SDL_Window **window, SDL_Texture **texture, SDL_Texture **texture1, SDL_Texture **backgroundTexture, SDL_Texture **blockTexture)
 
 {
@@ -46,6 +78,7 @@ void gameView(SDL_Renderer **renderer, SDL_Window **window, SDL_Texture **textur
 
     // Ladda bakgrundstexturen
     loadBackground(*renderer, backgroundTexture);
+    // loadYouDiedTexture(renderer, youDiedTexture);
     loadBlock(*renderer, blockTexture);
 }
 void drawLives(SDL_Renderer *renderer, int lives, int x, int y)
@@ -72,6 +105,7 @@ void loadBackground(SDL_Renderer *renderer, SDL_Texture **backgroundTexture)
     SDL_FreeSurface(surface);
 }
 
+
 void loadBlock(SDL_Renderer *renderer, SDL_Texture **blockTexture)
 {
     SDL_Surface *surface = IMG_Load("resources/speedTile3.png");
@@ -84,7 +118,7 @@ void loadBlock(SDL_Renderer *renderer, SDL_Texture **blockTexture)
     *blockTexture = SDL_CreateTextureFromSurface(renderer, surface);
     SDL_FreeSurface(surface);
 }
-void renderView(SDL_Renderer *renderer, SDL_Texture *texture, SDL_Texture *texture1, SDL_Texture *backgroundTexture, SDL_Texture *blockTexture, GameModel *model, SDL_Rect shipRect)
+void renderView(SDL_Renderer *renderer, SDL_Texture *texture, SDL_Texture *texture1, SDL_Texture *backgroundTexture, SDL_Texture *blockTexture, GameModel *model, SDL_Rect shipRect, SDL_Texture *YouDiedTexture)
 {
     SDL_RenderClear(renderer);
 
@@ -95,9 +129,15 @@ void renderView(SDL_Renderer *renderer, SDL_Texture *texture, SDL_Texture *textu
         SDL_RenderCopy(renderer, backgroundTexture, NULL, NULL);
     }
 
+    if (YouDiedTexture)
+    {
+        SDL_RenderCopy(renderer, YouDiedTexture, NULL, NULL);
+    }
+
     SDL_Rect shipRectPlayers[4];
-    for (int i = 0; i < 4; i++) {
-        SDL_Rect shipRectPlayersI = { (int)model->player[i].x, (int)model->player[i].y, 50, 50 };
+    for (int i = 0; i < 4; i++)
+    {
+        SDL_Rect shipRectPlayersI = {(int)model->player[i].x, (int)model->player[i].y, 50, 50};
         shipRectPlayers[i] = shipRectPlayersI;
         SDL_RenderCopy(renderer, currentTexture, NULL, &shipRectPlayers[i]);
     }
@@ -105,14 +145,15 @@ void renderView(SDL_Renderer *renderer, SDL_Texture *texture, SDL_Texture *textu
     SDL_RenderCopy(renderer, currentTexture, NULL, &shipRect);
     for (int i = 0; i < model->environment.activeBlocks; i++)
     {
-        //placeTile(renderer, texture, model->environment.blockPositions[i].x, model->environment.blockPositions[i].y);
+        // placeTile(renderer, texture, model->environment.blockPositions[i].x, model->environment.blockPositions[i].y);
         placeTile(renderer, blockTexture, model->environment.blockPositions[i].x, model->environment.blockPositions[i].y);
     }
 
     drawLives(renderer, model->player[0].playerLife, 10, 10); // Visa rektanglar som liv nedanför texten
 
-    if (model->gameState.lifeActive){
-       drawExtraLife(renderer, model->gameState.lifePosX, model->gameState.lifePosY);
+    if (model->gameState.lifeActive)
+    {
+        //    drawExtraLife(renderer, model->gameState.lifePosX, model->gameState.lifePosY);
     }
 
     SDL_RenderPresent(renderer);
@@ -132,16 +173,14 @@ void placeTile(SDL_Renderer *renderer, SDL_Texture *texture, int x, int y)
     SDL_RenderCopy(renderer, texture, NULL, &tileRect);
 }
 
-void drawExtraLife(SDL_Renderer* renderer, int x, int y) {
-    int barWidth = 15;
-    SDL_Color color = {255, 0, 0};
-    //printf("x: %d, y: %d\n", x, y);
-    SDL_Rect rect = {x, y, barWidth, 20};
-    //SDL_Rect rect = {20, 20, 20, 20};
-    SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, 255);
-    SDL_RenderFillRect(renderer, &rect);
-    //printf("Extra life\n");
-    
-}
+// void drawExtraLife(SDL_Renderer* renderer, int x, int y) {
+//     int barWidth = 15;
+//     SDL_Color color = {255, 0, 0};
+//     //printf("x: %d, y: %d\n", x, y);
+//     SDL_Rect rect = {x, y, barWidth, 20};
+//     //SDL_Rect rect = {20, 20, 20, 20};
+//     SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, 255);
+//     SDL_RenderFillRect(renderer, &rect);
+//     //printf("Extra life\n");
 
-
+// }

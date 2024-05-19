@@ -8,17 +8,19 @@
 // void initView(SDL_Renderer** renderer, SDL_Window** window, SDL_Texture** texture);
 // void renderView(SDL_Renderer* renderer, SDL_Texture* texture, GameModel* model);
 // void closeView(SDL_Renderer* renderer, SDL_Window* window, SDL_Texture* texture);
-void menuView(SDL_Renderer **renderer, SDL_Window **window, SDL_Texture **backgroundTexture, SDL_Texture **continueTexture, SDL_Texture **exitTexture, SDL_Texture **volumeTexture);
+void menuView(SDL_Renderer **renderer, SDL_Window **window, SDL_Texture **backgroundTexture, SDL_Texture **continueTexture, SDL_Texture **exitTexture, SDL_Texture **volumeTexture, SDL_Texture **youDiedTexture);
 void renderMenu(SDL_Renderer **renderer, SDL_Window **window, SDL_Texture **backgroundTexture, SDL_Texture **continueTexture, SDL_Texture **exitTexture, SDL_Rect continueButtonRect, SDL_Rect exitButtonRect, SDL_Rect volumeButtonRect, SDL_Texture **volumeTexture);
+void renderYouDied(SDL_Renderer **renderer, SDL_Window **window, SDL_Texture **youDiedTexture);
+void loadYouDiedTexture(SDL_Renderer *renderer, SDL_Texture **youDiedTexture);
+// void YoudiedView(SDL_Renderer **renderer, SDL_Window **window, SDL_Texture **youDiedTexture);
 void gameView(SDL_Renderer **renderer, SDL_Window **window, SDL_Texture **texture, SDL_Texture **texture1, SDL_Texture **backgroundTexture, SDL_Texture **blockTexture);
-//void gameView(SDL_Renderer **renderer, SDL_Window **window, SDL_Texture **texture, SDL_Texture **backgroundTexture, SDL_Texture **blockTexture);
-//void renderView(SDL_Renderer *renderer, SDL_Texture *shipTexture, SDL_Texture *backgroundTexture, SDL_Texture *blockTexture, GameModel *model, Player* player, SDL_Rect shipRect);
-void renderView(SDL_Renderer *renderer, SDL_Texture *texture, SDL_Texture *texture1, SDL_Texture *backgroundTexture, SDL_Texture *blockTexture, GameModel *model, SDL_Rect shipRect);
+void renderView(SDL_Renderer *renderer, SDL_Texture *texture, SDL_Texture *texture1, SDL_Texture *backgroundTexture, SDL_Texture *blockTexture, GameModel *model, SDL_Rect shipRect, SDL_Texture *YouDiedTexture);
 void closeView(SDL_Renderer *renderer, SDL_Window *window, SDL_Texture *shipTexture, SDL_Texture *backgroundTexture, SDL_Texture *blockTexture);
 void loadBackground(SDL_Renderer *renderer, SDL_Texture **backgroundTexture);
+void loadYouDiedTexture(SDL_Renderer *renderer, SDL_Texture **youDiedTexture);
 void loadBlock(SDL_Renderer *renderer, SDL_Texture **blockTexture);
 void placeTile(SDL_Renderer *renderer, SDL_Texture *texture, int x, int y);
-void drawLives(SDL_Renderer* renderer, int lives, int x, int y);
-void drawExtraLife(SDL_Renderer* renderer, int x, int y);
+void drawLives(SDL_Renderer *renderer, int lives, int x, int y);
+void drawExtraLife(SDL_Renderer *renderer, int x, int y);
 
 #endif
