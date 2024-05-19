@@ -23,6 +23,13 @@ void menuView(SDL_Renderer **renderer, SDL_Window **window, SDL_Texture **backgr
     SDL_FreeSurface(volumeSurface); // Korrekt frigör ytan    
 }
 
+
+void renderWaitForPlayers(SDL_Renderer **renderer, SDL_Window **window, SDL_Texture **backgroundTexture)
+{
+    SDL_RenderClear(*renderer);
+    SDL_RenderCopy(*renderer, *backgroundTexture, NULL, NULL);
+    SDL_RenderPresent(*renderer);
+}
 void renderMenu(SDL_Renderer **renderer, SDL_Window **window, SDL_Texture **backgroundTexture, SDL_Texture **continueTexture, SDL_Texture **exitTexture, SDL_Rect continueButtonRect, SDL_Rect exitButtonRect, SDL_Rect volumeButtonRect, SDL_Texture **volumeTexture)
 {
     SDL_RenderClear(*renderer);

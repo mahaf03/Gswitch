@@ -13,6 +13,7 @@ void renderMenu(SDL_Renderer **renderer, SDL_Window **window, SDL_Texture **back
 void renderYouDied(SDL_Renderer **renderer, SDL_Window **window, SDL_Texture **youDiedTexture);
 void loadYouDiedTexture(SDL_Renderer *renderer, SDL_Texture **youDiedTexture);
 // void YoudiedView(SDL_Renderer **renderer, SDL_Window **window, SDL_Texture **youDiedTexture);
+void renderWaitForPlayers(SDL_Renderer **renderer, SDL_Window **window, SDL_Texture **backgroundTexture);
 void gameView(SDL_Renderer **renderer, SDL_Window **window, SDL_Texture **texture, SDL_Texture **texture1, SDL_Texture **backgroundTexture, SDL_Texture **blockTexture);
 void renderView(SDL_Renderer *renderer, SDL_Texture *texture, SDL_Texture *texture1, SDL_Texture *backgroundTexture, SDL_Texture *blockTexture, GameModel *model, SDL_Rect shipRect, SDL_Texture *YouDiedTexture);
 void closeView(SDL_Renderer *renderer, SDL_Window *window, SDL_Texture *shipTexture, SDL_Texture *backgroundTexture, SDL_Texture *blockTexture);
