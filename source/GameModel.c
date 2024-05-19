@@ -21,7 +21,7 @@ void initializeModel(GameModel *model)
         model->player[i].playerSpeed = 4.0f;
         model->player[i].isImmortal = false;    // Initially not immortal
         model->player[i].immortalStartTime = 0; // Reset time
-        model->player[i].playerLife = 1;
+        model->player[i].playerLife = 4;
         model->player[i].playerID = -1;
     }
     model->environment.blockSpeed = 5;

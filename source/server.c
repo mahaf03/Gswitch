@@ -4,7 +4,6 @@
 #include <stdbool.h>
 #include "SDL2/SDL_net.h"
 #include "Network.h"
-#include "server.h"
 // #define MAX_PLAYERS 4;
 
 int main(int argc, char **argv)
@@ -16,7 +15,6 @@ int main(int argc, char **argv)
   printf("opening server..\n");
   udpDataToClient dataSend = {};
   int playercount = 0;
- // Bemnet här har vi 4 spelare
   dataSend.status = 0;
   IPaddress players[4];
 
@@ -44,10 +42,9 @@ int main(int argc, char **argv)
         {
           // the message is from a not already connected player
           playercount++;
-          if (playercount == 2)
+          if (playercount == 4)
           {
-            fourPlayers = true;
-            dataSend.status = 1; // En statusflagga som indikerar att spelet har startat
+            dataSend.gameReady = true;
             printf("Fyra spelare anslutna, spelet startar!\n");
           }
           printf("Player %d connected! \n \t %x \n \t %d\n", i + 1, host.host, host.port);

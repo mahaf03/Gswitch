@@ -6,7 +6,6 @@
 #include "GameView.h"
 #include "GameController.h"
 #include "Network.h"
-#include "server.h"
 
 void clearScreenAndStopMusic(SDL_Renderer *renderer, Mix_Music *music,
                              SDL_Texture **texture, SDL_Texture **texture1, SDL_Texture **bgTexture,
@@ -51,6 +50,7 @@ int main(int argv, char **args)
     GameModel model;
     window = SDL_CreateWindow("GSwitch", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1200, 686, 0);
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+    bool gameReady = false;
 
     SDL_Rect continueButtonRect = {470, 100, 200, 200}; // Centrerad position och storlek för "Continue" knappen
     SDL_Rect exitButtonRect = {500, 250, 150, 200};
@@ -121,6 +121,8 @@ int main(int argv, char **args)
                         printf("Pressed continue button\n");
                         gameView(&renderer, &window, &texture, &texture1, &bgTexture, &blockTexture);
                         currentState = waitForPlayers;
+                        udpDataToServer testdata = {model.player[0], 0};
+                        clientSendPacket(testdata, &srvadd, &sd);
                     }
                     else if (mouseX >= exitButtonRect.x && mouseX <= exitButtonRect.x + exitButtonRect.w &&
                              mouseY >= exitButtonRect.y && mouseY <= exitButtonRect.y + exitButtonRect.h)
@@ -160,7 +162,7 @@ int main(int argv, char **args)
             // Rendera vänta på spelare-skärmen
             renderWaitForPlayers(&renderer, &window, &bgTexture);
             // Kolla om vi har fått tillräckligt med spelare
-            if (playercount >= 2 && fourPlayers == true)
+            if (gameReady)
             {
                 currentState = Game;
             }
@@ -236,6 +238,7 @@ int main(int argv, char **args)
             printf("new message from %x:\n", addrr.host);
             printf("\tx:\t%f\n\ty:\t%f\n}", message.player.x, message.player.y);
             model.player[0].playerID = message.clientId; // assign this clients playerID
+            gameReady = message.gameReady;
             for (int i = 0; i < 4; i++)
             {
                 if (message.player.playerID == model.player[0].playerID)
