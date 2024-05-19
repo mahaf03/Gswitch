@@ -44,7 +44,7 @@ int main(int argc, char **argv)
         {
           // the message is from a not already connected player
           playercount++;
-          if (playercount == 1)
+          if (playercount == 2)
           {
             fourPlayers = true;
             dataSend.status = 1; // En statusflagga som indikerar att spelet har startat
@@ -79,7 +79,7 @@ int main(int argc, char **argv)
         printf("New packet received from Player %d at %x !\n\t %f %f %d \n", playerNo + 1, host.host, message.player.x, message.player.y, message.status);
 
         // Kollar ifall spelaren har disconnectat
-        if (message.status == 3)
+        if (message.status == 1)
         {
           quit = 1;
         }
