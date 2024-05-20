@@ -9,89 +9,7 @@
 #include <SDL2/SDL_ttf.h>
 
 // Funktion för att rendera text
-SDL_Texture *renderText(const char *message, const char *fontFile, SDL_Color color, int fontSize, SDL_Renderer *renderer)
-{
-    TTF_Font *font = TTF_OpenFont(fontFile, fontSize);
-    if (!font)
-    {
-        printf("TTF_OpenFont: %s\n", TTF_GetError());
-        return NULL;
-    }
 
-    SDL_Surface *surf = TTF_RenderText_Blended(font, message, color);
-    if (!surf)
-    {
-        TTF_CloseFont(font);
-        printf("TTF_RenderText: %s\n", TTF_GetError());
-        return NULL;
-    }
-
-    SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surf);
-    if (!texture)
-    {
-        printf("SDL_CreateTextureFromSurface: %s\n", SDL_GetError());
-    }
-
-    SDL_FreeSurface(surf);
-    TTF_CloseFont(font);
-    return texture;
-}
-
-// Funktion för att få IP-adress från användaren
-void getInputIP(char *ipBuffer, int bufferSize, SDL_Renderer *renderer, GameWindowState *currentState, SDL_Texture *backgroundTexture)
-{
-    SDL_StartTextInput();
-    bool done = false;
-    SDL_Event e;
-    SDL_Color textColor = {255, 255, 255, 255};
-    SDL_Rect inputRect = {400, 300, 400, 50}; // Justera detta efter behov
-    char inputText[bufferSize];
-    strcpy(inputText, "");
-
-    while (!done)
-    {
-        while (SDL_PollEvent(&e) != 0)
-        {
-            if (e.type == SDL_QUIT)
-            {
-                done = true;
-            }
-            else if (e.type == SDL_TEXTINPUT)
-            {
-                if (strlen(inputText) + strlen(e.text.text) < bufferSize - 1)
-                {
-                    strcat(inputText, e.text.text);
-                }
-            }
-            else if (e.type == SDL_KEYDOWN)
-            {
-                if (e.key.keysym.sym == SDLK_BACKSPACE && strlen(inputText) > 0)
-                {
-                    inputText[strlen(inputText) - 1] = '\0';
-                }
-                else if (e.key.keysym.sym == SDLK_RETURN)
-                {
-                    strcpy(ipBuffer, inputText);
-                    done = true;
-                    *currentState = Menu; // Uppdatera spelets tillstånd till Menu
-                }
-            }
-        }
-
-        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-        SDL_RenderClear(renderer);
-        if (backgroundTexture)
-        {
-            SDL_RenderCopy(renderer, backgroundTexture, NULL, NULL);
-        }
-        SDL_Texture *textTexture = renderText(inputText, "resources/lato-italic.ttf", textColor, 24, renderer);
-        SDL_RenderCopy(renderer, textTexture, NULL, &inputRect);
-        SDL_RenderPresent(renderer);
-        SDL_DestroyTexture(textTexture);
-    }
-
-    SDL_StopTextInput();
-}
 
 int main(int argv, char **args)
 {
@@ -114,10 +32,10 @@ int main(int argv, char **args)
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
     bool gameReady = false;
 
-    SDL_Rect continueButtonRect = {470, 100, 200, 200}; // Centrerad position och storlek för "Continue" knappen
-    SDL_Rect exitButtonRect = {500, 250, 150, 200};
-    SDL_Rect volumeButtonRect = {500, 430, 150, 150};
-    SDL_Rect MuteButtonRect = {500, 430, 150, 150}; // Positionerad under "Continue" knappen med 50 pixels mellanrum
+    SDL_Rect continueButtonRect = {425, 128, 350, 150}; // Centrerad position och storlek för "Continue" knappen
+    SDL_Rect exitButtonRect = {425, 308, 350, 150};
+    SDL_Rect volumeButtonRect = {425, 488, 350, 150};
+ 
 
     initializeModel(&model);
 
@@ -128,7 +46,7 @@ int main(int argv, char **args)
         success = false;
     }
 
-    Mix_Music *backgroundMusic = Mix_LoadMUS("resources/music2.mp3");
+    Mix_Music *backgroundMusic = Mix_LoadMUS("resources/music.mp3");
     if (backgroundMusic == NULL)
     {
         printf("Failed to load background music! SDL_mixer Error: %s\n", Mix_GetError());
@@ -144,6 +62,35 @@ int main(int argv, char **args)
         printf("TTF_Init: %s\n", TTF_GetError());
         exit(1);
     }
+    SDL_Color textColor = {255, 255, 255, 255}; // Vit färg
+    SDL_Texture *joinGameText = renderText("Join Game", "resources/lato-italic.ttf", textColor, 36, renderer);
+    SDL_Texture *exitText = renderText("Exit", "resources/lato-italic.ttf", textColor, 36, renderer);
+    SDL_Texture *muteText = renderText("Mute", "resources/lato-italic.ttf", textColor, 36, renderer);
+
+    // Hämta storleken på texturerna
+    int joinGameTextWidth, joinGameTextHeight;
+    SDL_QueryTexture(joinGameText, NULL, NULL, &joinGameTextWidth, &joinGameTextHeight);
+    SDL_Rect joinGameTextRect = {
+        continueButtonRect.x + (continueButtonRect.w - joinGameTextWidth) / 2,
+        continueButtonRect.y + (continueButtonRect.h - joinGameTextHeight) / 2,
+        joinGameTextWidth,
+        joinGameTextHeight};
+
+    int exitTextWidth, exitTextHeight;
+    SDL_QueryTexture(exitText, NULL, NULL, &exitTextWidth, &exitTextHeight);
+    SDL_Rect exitTextRect = {
+        exitButtonRect.x + (exitButtonRect.w - exitTextWidth) / 2,
+        exitButtonRect.y + (exitButtonRect.h - exitTextHeight) / 2,
+        exitTextWidth,
+        exitTextHeight};
+
+    int muteTextWidth, muteTextHeight;
+    SDL_QueryTexture(muteText, NULL, NULL, &muteTextWidth, &muteTextHeight);
+    SDL_Rect muteTextRect = {
+        volumeButtonRect.x + (volumeButtonRect.w - muteTextWidth) / 2,
+        volumeButtonRect.y + (volumeButtonRect.h - muteTextHeight) / 2,
+        muteTextWidth,
+        muteTextHeight};
     const int FPS = 60;
     const int frameDelay = 1000 / FPS; // Tiden varje frame bör ta
     Uint32 frameStart;
