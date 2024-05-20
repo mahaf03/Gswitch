@@ -110,15 +110,15 @@ void menuView(SDL_Renderer **renderer, SDL_Window **window, SDL_Texture **backgr
     *backgroundTexture = SDL_CreateTextureFromSurface(*renderer, surface);
     SDL_FreeSurface(surface);
 
-    SDL_Surface *continueSurface = IMG_Load("resources/button.png");
+    SDL_Surface *continueSurface = IMG_Load("resources/continue.png");
     *continueTexture = SDL_CreateTextureFromSurface(*renderer, continueSurface);
     SDL_FreeSurface(continueSurface);
 
-    SDL_Surface *exitSurface = IMG_Load("resources/button.png");
+    SDL_Surface *exitSurface = IMG_Load("resources/exit.png");
     *exitTexture = SDL_CreateTextureFromSurface(*renderer, exitSurface);
     SDL_FreeSurface(exitSurface);
 
-    SDL_Surface *volumeSurface = IMG_Load("resources/button.png");
+    SDL_Surface *volumeSurface = IMG_Load("resources/mute.png");
     *volumeTexture = SDL_CreateTextureFromSurface(*renderer, volumeSurface);
     SDL_FreeSurface(volumeSurface); // Korrekt frigör ytan
 }

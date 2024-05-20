@@ -32,10 +32,10 @@ int main(int argv, char **args)
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
     bool gameReady = false;
 
-    SDL_Rect continueButtonRect = {425, 128, 350, 150}; // Centrerad position och storlek för "Continue" knappen
-    SDL_Rect exitButtonRect = {425, 308, 350, 150};
-    SDL_Rect volumeButtonRect = {425, 488, 350, 150};
- 
+    SDL_Rect continueButtonRect = {470, 100, 200, 200}; // Centrerad position och storlek för "Continue" knappen
+    SDL_Rect exitButtonRect = {500, 250, 150, 200};
+    SDL_Rect volumeButtonRect = {500, 430, 150, 150};
+    SDL_Rect MuteButtonRect = {500, 430, 150, 150}; // Positionerad under "Continue" knappen med 50 pixels mellanrum
 
     initializeModel(&model);
 
@@ -62,35 +62,6 @@ int main(int argv, char **args)
         printf("TTF_Init: %s\n", TTF_GetError());
         exit(1);
     }
-    SDL_Color textColor = {255, 255, 255, 255}; // Vit färg
-    SDL_Texture *joinGameText = renderText("Join Game", "resources/lato-italic.ttf", textColor, 36, renderer);
-    SDL_Texture *exitText = renderText("Exit", "resources/lato-italic.ttf", textColor, 36, renderer);
-    SDL_Texture *muteText = renderText("Mute", "resources/lato-italic.ttf", textColor, 36, renderer);
-
-    // Hämta storleken på texturerna
-    int joinGameTextWidth, joinGameTextHeight;
-    SDL_QueryTexture(joinGameText, NULL, NULL, &joinGameTextWidth, &joinGameTextHeight);
-    SDL_Rect joinGameTextRect = {
-        continueButtonRect.x + (continueButtonRect.w - joinGameTextWidth) / 2,
-        continueButtonRect.y + (continueButtonRect.h - joinGameTextHeight) / 2,
-        joinGameTextWidth,
-        joinGameTextHeight};
-
-    int exitTextWidth, exitTextHeight;
-    SDL_QueryTexture(exitText, NULL, NULL, &exitTextWidth, &exitTextHeight);
-    SDL_Rect exitTextRect = {
-        exitButtonRect.x + (exitButtonRect.w - exitTextWidth) / 2,
-        exitButtonRect.y + (exitButtonRect.h - exitTextHeight) / 2,
-        exitTextWidth,
-        exitTextHeight};
-
-    int muteTextWidth, muteTextHeight;
-    SDL_QueryTexture(muteText, NULL, NULL, &muteTextWidth, &muteTextHeight);
-    SDL_Rect muteTextRect = {
-        volumeButtonRect.x + (volumeButtonRect.w - muteTextWidth) / 2,
-        volumeButtonRect.y + (volumeButtonRect.h - muteTextHeight) / 2,
-        muteTextWidth,
-        muteTextHeight};
     const int FPS = 60;
     const int frameDelay = 1000 / FPS; // Tiden varje frame bör ta
     Uint32 frameStart;
