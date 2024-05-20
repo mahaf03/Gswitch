@@ -8,6 +8,7 @@
 
 typedef enum
 {
+    Ip,
     Menu,
     Game,
     MusicOn,

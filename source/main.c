@@ -6,29 +6,88 @@
 #include "GameView.h"
 #include "GameController.h"
 #include "Network.h"
+#include <SDL2/SDL_ttf.h>
 
-void clearScreenAndStopMusic(SDL_Renderer *renderer, Mix_Music *music,
-                             SDL_Texture **texture, SDL_Texture **texture1, SDL_Texture **bgTexture,
-                             SDL_Texture **blockTexture, SDL_Texture **continueTexture,
-                             SDL_Texture **exitTexture, SDL_Texture **volumeTexture, SDL_Texture **muteVolume)
+// Funktion för att rendera text
+SDL_Texture *renderText(const char *message, const char *fontFile, SDL_Color color, int fontSize, SDL_Renderer *renderer)
 {
-    if (music != NULL)
+    TTF_Font *font = TTF_OpenFont(fontFile, fontSize);
+    if (!font)
     {
-        Mix_HaltMusic();
+        printf("TTF_OpenFont: %s\n", TTF_GetError());
+        return NULL;
     }
 
-    SDL_Texture *textures[] = {*texture, *texture1, *bgTexture, *blockTexture, *continueTexture, *exitTexture, *volumeTexture, *muteVolume};
-    for (int i = 0; i < sizeof(textures) / sizeof(SDL_Texture *); ++i)
+    SDL_Surface *surf = TTF_RenderText_Blended(font, message, color);
+    if (!surf)
     {
-        if (textures[i] != NULL)
+        TTF_CloseFont(font);
+        printf("TTF_RenderText: %s\n", TTF_GetError());
+        return NULL;
+    }
+
+    SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surf);
+    if (!texture)
+    {
+        printf("SDL_CreateTextureFromSurface: %s\n", SDL_GetError());
+    }
+
+    SDL_FreeSurface(surf);
+    TTF_CloseFont(font);
+    return texture;
+}
+
+// Funktion för att få IP-adress från användaren
+void getInputIP(char *ipBuffer, int bufferSize, SDL_Renderer *renderer, GameWindowState *currentState)
+{
+    SDL_StartTextInput();
+    bool done = false;
+    SDL_Event e;
+    SDL_Color textColor = {255, 255, 255, 255};
+    SDL_Rect inputRect = {400, 300, 400, 50}; // Justera detta efter behov
+    char inputText[bufferSize];
+    strcpy(inputText, "");
+
+    while (!done)
+    {
+        while (SDL_PollEvent(&e) != 0)
         {
-            SDL_DestroyTexture(textures[i]);
-            textures[i] = NULL;
+            if (e.type == SDL_QUIT)
+            {
+                done = true;
+            }
+            else if (e.type == SDL_TEXTINPUT)
+            {
+                if (strlen(inputText) + strlen(e.text.text) < bufferSize - 1)
+                {
+                    strcat(inputText, e.text.text);
+                }
+            }
+            else if (e.type == SDL_KEYDOWN)
+            {
+                if (e.key.keysym.sym == SDLK_BACKSPACE && strlen(inputText) > 0)
+                {
+                    inputText[strlen(inputText) - 1] = '\0';
+                }
+                else if (e.key.keysym.sym == SDLK_RETURN)
+                {
+                    strcpy(ipBuffer, inputText);
+                    done = true;
+                    *currentState = Menu; // Uppdatera spelets tillstånd till Menu
+                }
+            }
         }
+
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+        SDL_RenderClear(renderer);
+
+        SDL_Texture *textTexture = renderText(inputText, "resources/lato-italic.ttf", textColor, 24, renderer);
+        SDL_RenderCopy(renderer, textTexture, NULL, &inputRect);
+        SDL_RenderPresent(renderer);
+        SDL_DestroyTexture(textTexture);
     }
 
-    SDL_RenderClear(renderer);
-    SDL_RenderPresent(renderer);
+    SDL_StopTextInput();
 }
 
 int main(int argv, char **args)
@@ -77,7 +136,11 @@ int main(int argv, char **args)
     Mix_PlayMusic(backgroundMusic, -1); // Sista argumentet är antalet repetitioner (-1 för oändlig loop)
 
     menuView(&renderer, &window, &bgTexture, &continueTexture, &exitTexture, &volumeTexture, &youDiedTexture);
-
+    if (TTF_Init() == -1)
+    {
+        printf("TTF_Init: %s\n", TTF_GetError());
+        exit(1);
+    }
     const int FPS = 60;
     const int frameDelay = 1000 / FPS; // Tiden varje frame bör ta
     Uint32 frameStart;
@@ -95,7 +158,7 @@ int main(int argv, char **args)
     // Allocate memory for UDP packets
     bool closeWindow = false;
     GameWindowState currentMusicState = MusicOn;
-    GameWindowState currentState = Menu;
+    GameWindowState currentState = Ip;
 
     float prePosX = model.player[0].x;
     float prePosY = model.player[0].y;
@@ -119,7 +182,6 @@ int main(int argv, char **args)
                         mouseY >= continueButtonRect.y && mouseY <= continueButtonRect.y + continueButtonRect.h)
                     {
                         printf("Pressed continue button\n");
-                        gameView(&renderer, &window, &texture, &texture1, &bgTexture, &blockTexture);
                         currentState = waitForPlayers;
                         udpDataToServer testdata = {model.player[0], 0};
                         clientSendPacket(testdata, &srvadd, &sd);
@@ -146,15 +208,29 @@ int main(int argv, char **args)
                     }
                 }
             }
+
+            if (currentState == Ip)
+            {
+                char ipAddress[20];
+                getInputIP(ipAddress, sizeof(ipAddress), renderer, &currentState);
+
+                if (SDLNet_ResolveHost(&srvadd, ipAddress, 49156) == -1)
+                {
+                    fprintf(stderr, "SDLNet_ResolveHost(%s 49156): %s\n", ipAddress, SDLNet_GetError());
+                    exit(EXIT_FAILURE);
+                }
+            }
+
             if (currentState == Game)
             {
+
+                gameView(&renderer, &window, &texture, &texture1, &bgTexture, &blockTexture);
                 handleEvent(&event, &model.player[0], &closeWindow);
             }
         }
         if (currentState == Menu)
         {
             // Rendera menyn
-
             renderMenu(&renderer, &window, &bgTexture, &continueTexture, &exitTexture, continueButtonRect, exitButtonRect, volumeButtonRect, &volumeTexture);
         }
         else if (currentState == waitForPlayers)
@@ -166,7 +242,6 @@ int main(int argv, char **args)
             {
                 currentState = Game;
             }
-            
         }
 
         else if (!model.alive)
@@ -274,5 +349,6 @@ int main(int argv, char **args)
 
     closeView(renderer, window, texture, bgTexture, blockTexture);
     SDL_Quit();
+    TTF_Quit();
     return 0;
 }

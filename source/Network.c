@@ -20,11 +20,6 @@ void initNetwork_Client( UDPsocket* sd, IPaddress* srvadd, UDPpacket* pReceive)
       fprintf(stderr, "SDLNet_UDP_Open: %s\n", SDLNet_GetError());
       exit(EXIT_FAILURE);
     }
-  if (SDLNet_ResolveHost(srvadd, SERVERADDRESS, 49156) == -1)
-    {
-      fprintf(stderr, "SDLNet_ResolveHost(192.0.0.1 2000): %s\n", SDLNet_GetError());
-      exit(EXIT_FAILURE);
-    }
 }
 
 void initNetwork_Server(UDPsocket* sd)

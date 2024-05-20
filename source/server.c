@@ -42,7 +42,7 @@ int main(int argc, char **argv)
         {
           // the message is from a not already connected player
           playercount++;
-          if (playercount == 4)
+          if (playercount == 2)
           {
             dataSend.gameReady = true;
             printf("Fyra spelare anslutna, spelet startar!\n");
