@@ -38,7 +38,7 @@ SDL_Texture *renderText(const char *message, const char *fontFile, SDL_Color col
 }
 
 // Funktion för att få IP-adress från användaren
-void getInputIP(char *ipBuffer, int bufferSize, SDL_Renderer *renderer, GameWindowState *currentState)
+void getInputIP(char *ipBuffer, int bufferSize, SDL_Renderer *renderer, GameWindowState *currentState, SDL_Texture *backgroundTexture)
 {
     SDL_StartTextInput();
     bool done = false;
@@ -80,7 +80,10 @@ void getInputIP(char *ipBuffer, int bufferSize, SDL_Renderer *renderer, GameWind
 
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
-
+        if (backgroundTexture)
+        {
+            SDL_RenderCopy(renderer, backgroundTexture, NULL, NULL);
+        }
         SDL_Texture *textTexture = renderText(inputText, "resources/lato-italic.ttf", textColor, 24, renderer);
         SDL_RenderCopy(renderer, textTexture, NULL, &inputRect);
         SDL_RenderPresent(renderer);
@@ -212,7 +215,7 @@ int main(int argv, char **args)
             if (currentState == Ip)
             {
                 char ipAddress[20];
-                getInputIP(ipAddress, sizeof(ipAddress), renderer, &currentState);
+                getInputIP(ipAddress, sizeof(ipAddress), renderer, &currentState, bgTexture);
 
                 if (SDLNet_ResolveHost(&srvadd, ipAddress, 49156) == -1)
                 {
@@ -271,8 +274,8 @@ int main(int argv, char **args)
         else if (currentState == Game)
         {
             // Uppdatera och rendera spelet
-            SDL_DestroyTexture(continueTexture);
-            SDL_DestroyTexture(exitTexture);
+            // SDL_DestroyTexture(continueTexture);
+            // SDL_DestroyTexture(exitTexture);
 
             // Move players
             for (int i = 0; i < 4; i++)
