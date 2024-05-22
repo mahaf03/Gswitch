@@ -9,6 +9,7 @@
 typedef enum
 {
     Ip,
+    EnterName,
     Menu,
     Game,
     MusicOn,
@@ -34,6 +35,7 @@ typedef struct {
     Uint32 immortalStartTime;
     int playerID;
     PlayerImage currentPlayerImage;
+    char playerName[128];
 } Player;
 
 typedef struct {

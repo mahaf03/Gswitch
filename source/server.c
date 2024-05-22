@@ -47,7 +47,7 @@ int main(int argc, char **argv)
             dataSend.gameReady = true;
             printf("Fyra spelare anslutna, spelet startar!\n");
           }
-          printf("Player %d connected! \n \t %x \n \t %d\n", i + 1, host.host, host.port);
+          printf("Player %s connected! \n \t %x \n \t %d\n",  message.player.playerName, host.host, host.port);
           players[i] = host;
           playerNo = i;
           break;

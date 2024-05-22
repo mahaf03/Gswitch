@@ -282,6 +282,75 @@ void placeTile(SDL_Renderer *renderer, SDL_Texture *texture, int x, int y)
     SDL_RenderCopy(renderer, texture, NULL, &tileRect);
 }
 
+void getInputName(char *nameBuffer, int bufferSize, SDL_Renderer *renderer, GameWindowState *currentState, SDL_Texture *backgroundTexture)
+{
+    SDL_StartTextInput();
+    bool done = false;
+    SDL_Event e;
+    SDL_Color textColor = {255, 255, 255, 255};
+    SDL_Rect inputRect = {400, 300, 400, 50};   // Justera detta efter behov
+    SDL_Rect messageRect = {400, 250, 400, 50}; // Position och storlek för meddelandetexten
+    char inputText[bufferSize];
+    strcpy(inputText, "");
+
+    // Skapa texturen för meddelandet "Enter Your Name"
+    SDL_Texture *messageTexture = renderText("Enter Your Name", "resources/lato-italic.ttf", textColor, 24, renderer);
+
+    while (!done)
+    {
+        while (SDL_PollEvent(&e) != 0)
+        {
+            if (e.type == SDL_QUIT)
+            {
+                done = true;
+            }
+            else if (e.type == SDL_TEXTINPUT)
+            {
+                if (strlen(inputText) + strlen(e.text.text) < bufferSize - 1)
+                {
+                    strcat(inputText, e.text.text);
+                }
+            }
+            else if (e.type == SDL_KEYDOWN)
+            {
+                if (e.key.keysym.sym == SDLK_BACKSPACE && strlen(inputText) > 0)
+                {
+                    inputText[strlen(inputText) - 1] = '\0';
+                }
+                else if (e.key.keysym.sym == SDLK_RETURN)
+                {
+                    strcpy(nameBuffer, inputText);
+                    done = true;
+                    *currentState = Menu; // Uppdatera spelets tillstånd till Menu
+                }
+            }
+        }
+
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+        SDL_RenderClear(renderer);
+
+        // Rendera bakgrundsbilden
+        if (backgroundTexture)
+        {
+            SDL_RenderCopy(renderer, backgroundTexture, NULL, NULL);
+        }
+
+        // Rendera meddelandetexten
+        SDL_RenderCopy(renderer, messageTexture, NULL, &messageRect);
+
+        // Rendera inmatningstexten
+        SDL_Texture *textTexture = renderText(inputText, "resources/lato-italic.ttf", textColor, 24, renderer);
+        SDL_RenderCopy(renderer, textTexture, NULL, &inputRect);
+
+        SDL_RenderPresent(renderer);
+        SDL_DestroyTexture(textTexture);
+    }
+
+    SDL_StopTextInput();
+    SDL_DestroyTexture(messageTexture);
+}
+
+
 // void drawExtraLife(SDL_Renderer* renderer, int x, int y) {
 //     int barWidth = 15;
 //     SDL_Color color = {255, 0, 0};

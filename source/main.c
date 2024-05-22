@@ -8,12 +8,10 @@
 #include "Network.h"
 #include <SDL2/SDL_ttf.h>
 
-// Funktion för att rendera text
-
 
 int main(int argv, char **args)
 {
-
+    // Initialisering av SDL och andra resurser
     SDL_Init(SDL_INIT_VIDEO);
     SDL_Window *window = NULL;
     SDL_Renderer *renderer = NULL;
@@ -67,8 +65,6 @@ int main(int argv, char **args)
     Uint32 frameStart;
     int frameTime;
     int playercount = 0;
-    // Du måste också passera en pekare till bakgrundstexturen till initView
-    // initView(&renderer, &window, &texture, &bgTexture);
     printf("initializing network... \n");
     UDPsocket sd;
     IPaddress srvadd;
@@ -79,10 +75,13 @@ int main(int argv, char **args)
     // Allocate memory for UDP packets
     bool closeWindow = false;
     GameWindowState currentMusicState = MusicOn;
-    GameWindowState currentState = Ip;
+    GameWindowState currentState = EnterName;
 
     float prePosX = model.player[0].x;
     float prePosY = model.player[0].y;
+
+    char playerName[256]; // Buffer för spelarens namn
+
     while (!closeWindow)
     {
         frameStart = SDL_GetTicks();
@@ -144,12 +143,20 @@ int main(int argv, char **args)
 
             if (currentState == Game)
             {
-
                 gameView(&renderer, &window, &texture, &texture1, &bgTexture, &blockTexture);
                 handleEvent(&event, &model.player[0], &closeWindow);
             }
         }
-        if (currentState == Menu)
+
+        if (currentState == EnterName)
+        {
+            // Rendera namninmatningsskärmen
+            getInputName(playerName, sizeof(playerName), renderer, &currentState, bgTexture);
+            clientSendPacket()
+            currentState = Ip; // Fortsätt till IP-inmatning efter att namnet har matats in
+
+        }
+        else if (currentState == Menu)
         {
             // Rendera menyn
             renderMenu(&renderer, &window, &bgTexture, &continueTexture, &exitTexture, continueButtonRect, exitButtonRect, volumeButtonRect, &volumeTexture);
