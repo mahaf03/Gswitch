@@ -31,9 +31,9 @@ int main(int argv, char **args)
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
     bool gameReady = false;
 
-    SDL_Rect continueButtonRect = {470, 100, 200, 200}; // Centrerad position och storlek för "Continue" knappen
-    SDL_Rect exitButtonRect = {500, 250, 150, 200};
-    SDL_Rect volumeButtonRect = {500, 430, 150, 150};
+    SDL_Rect continueButtonRect = {450, 150, 300, 100}; // Centrerad position och storlek för "Continue" knappen
+    SDL_Rect exitButtonRect = {450, 300, 300, 100};
+    SDL_Rect volumeButtonRect = {450, 450, 300, 100};
     SDL_Rect MuteButtonRect = {500, 430, 150, 150}; // Positionerad under "Continue" knappen med 50 pixels mellanrum
 
     initializeModel(&model);
