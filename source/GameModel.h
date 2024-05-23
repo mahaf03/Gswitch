@@ -61,7 +61,7 @@ typedef struct {
     bool alive;
 } GameModel;
 
-void initializeModel(GameModel* model);
+void initializeModel(GameModel* model,const char *playerName);
 int min(int a, int b);
 int checkCollision(SDL_Rect *shipRect, SDL_Rect *blockRect);
 void handleCollision(Player *player, SDL_Rect shipRect, SDL_Rect *blockPositions, int numBlocks, GameModel *model);

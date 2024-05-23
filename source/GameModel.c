@@ -8,7 +8,7 @@
 #define SHIP_WIDTH 50
 #define SHIP_HEIGHT 50
 
-void initializeModel(GameModel *model)
+void initializeModel(GameModel *model, const char *playerName)
 {
     srand((unsigned int)time(NULL));
     for (int i = 0; i < 4; i++)
@@ -23,6 +23,8 @@ void initializeModel(GameModel *model)
         model->player[i].immortalStartTime = 0; // Reset time
         model->player[i].playerLife = 4;
         model->player[i].playerID = -1;
+        strncpy(model->player[i].playerName, playerName, sizeof(model->player[i].playerName) - 1); // Sätt spelarens namn
+        model->player[i].playerName[sizeof(model->player[i].playerName) - 1] = '\0'; // För säkerhets skull
     }
     model->environment.blockSpeed = 5;
     model->environment.activeBlocks = 5;         // Startar med 5 block

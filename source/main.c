@@ -35,8 +35,6 @@ int main(int argv, char **args)
     SDL_Rect volumeButtonRect = {500, 430, 150, 150};
     SDL_Rect MuteButtonRect = {500, 430, 150, 150}; // Positionerad under "Continue" knappen med 50 pixels mellanrum
 
-    initializeModel(&model);
-
     bool success = true;
     if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0)
     {
@@ -103,6 +101,7 @@ int main(int argv, char **args)
                     {
                         printf("Pressed continue button\n");
                         currentState = waitForPlayers;
+                        strcpy(model.player[0].playerName, playerName); // Testa om namnet skickas
                         udpDataToServer testdata = {model.player[0], 0};
                         clientSendPacket(testdata, &srvadd, &sd);
                     }
@@ -152,7 +151,7 @@ int main(int argv, char **args)
         {
             // Rendera namninmatningsskärmen
             getInputName(playerName, sizeof(playerName), renderer, &currentState, bgTexture);
-            clientSendPacket()
+            initializeModel(&model, playerName); // Initialisera modell med spelarens namn
             currentState = Ip; // Fortsätt till IP-inmatning efter att namnet har matats in
 
         }
@@ -259,6 +258,7 @@ int main(int argv, char **args)
                 {
                     model.player[i].x = message.player.x;
                     model.player[i].y = message.player.y;
+                    strcpy(model.player[i].playerName, message.player.playerName); // Uppdatera spelarens namn
                     break;
                 }
             }

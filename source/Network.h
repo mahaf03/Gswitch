@@ -15,6 +15,7 @@
 typedef struct udpDataToServer{
   Player player;
   int status; //idk what this is
+  char playerName[128];
     }udpDataToServer;
 typedef struct PlayerPos
 {
@@ -26,7 +27,9 @@ typedef struct udpDataToClient{
   int clientId;
   int status; //idk what this is
   bool gameReady;
+  char playerName[128];
     } udpDataToClient;
+
 void initNetwork_Client( UDPsocket* sd, IPaddress* srvadd, UDPpacket* pRecieve);
 void initNetwork_Server(UDPsocket* sd);
 void closeNetwork_Server(UDPsocket* sd, UDPpacket* pSent) ;
