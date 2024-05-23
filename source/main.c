@@ -10,7 +10,6 @@
 
 // Funktion för att rendera text
 
-
 int main(int argv, char **args)
 {
 
@@ -54,6 +53,7 @@ int main(int argv, char **args)
     }
 
     // Spela musik
+
     Mix_PlayMusic(backgroundMusic, -1); // Sista argumentet är antalet repetitioner (-1 för oändlig loop)
 
     menuView(&renderer, &window, &bgTexture, &continueTexture, &exitTexture, &volumeTexture, &youDiedTexture);
@@ -128,6 +128,14 @@ int main(int argv, char **args)
                         }
                     }
                 }
+                else if (currentState == Ip)
+                {
+                    if (event.type == SDL_QUIT)
+                    {
+                        closeWindow = true;
+                    }
+                }
+              
             }
 
             if (currentState == Ip)
