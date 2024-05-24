@@ -153,6 +153,7 @@ int main(int argv, char **args)
             if (currentState == Game)
             {
 
+                gameView(&renderer, &window, &texture, &texture1, &bgTexture, &blockTexture);
                 handleEvent(&event, &model.player[0], &closeWindow);
             }
         }
@@ -169,7 +170,6 @@ int main(int argv, char **args)
             if (gameReady)
             {
                 currentState = Game;
-                gameView(&renderer, &window, &texture, &texture1, &bgTexture, &blockTexture);
             }
         }
 
