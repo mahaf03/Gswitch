@@ -262,11 +262,24 @@ int main(int argv, char **args)
                 {
                     model.player[i].x = message.player.x;
                     model.player[i].y = message.player.y;
+                    model.player[i].playerLife = message.player.playerLife;
                     break;
                 }
             }
         }
+        int alive= 0;
+        int playerwon = -1;
+        for (int i = 0; i<4; i++)
+            {
+                if (model.player[i].playerLife>0)
+                    {alive++;}
+                else{playerwon = i;}
+            }
 
+        if (alive ==1)
+            {
+                printf("player %d has won!!\n\n",playerwon);
+            }
         if (frameDelay > frameTime)
         {
             SDL_Delay(frameDelay - frameTime);
