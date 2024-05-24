@@ -11,13 +11,18 @@ int main(int argc, char **argv)
 
   UDPsocket sd;
   UDPpacket *pSent;
-  Uint32 frameStart;
+  Uint32 startTime;
+  Uint32 startCount;
   printf("opening server..\n");
   udpDataToClient dataSend = {};
   int playercount = 0;
   dataSend.status = 0;
   IPaddress players[4];
-
+  int next30Rand[30];
+  for (int i=0;i<30;i++)
+    {
+      next30Rand[i] = rand() % 700;
+    }
   // initialize array of players Ipaddresses to be empty.
   for (int i = 0; i < 4; i++)
   {
@@ -46,6 +51,8 @@ int main(int argc, char **argv)
           {
             dataSend.gameReady = true;
             printf("Fyra spelare anslutna, spelet startar!\n");
+            startCount = startTime = SDL_GetTicks();
+
           }
           printf("Player %d connected! \n \t %x \n \t %d\n", i + 1, host.host, host.port);
           players[i] = host;
@@ -82,6 +89,7 @@ int main(int argc, char **argv)
         }
 
         dataSend.player = message.player;
+        memcpy(&dataSend.next30Rand ,&next30Rand,sizeof(int)*30);
         // resend the message to all other connected clients
         for (int i = 0; i < playercount; i++)
         {
@@ -98,6 +106,14 @@ int main(int argc, char **argv)
         }
       }
     }
+    if(SDL_GetTicks() - startCount > 5000)
+      {
+        startCount  = SDL_GetTicks();
+        for (int i=0;i<30;i++)
+          {
+            next30Rand[i] = rand() % 700;
+          }
+      }
   }
   closeNetwork_Server(&sd, pSent);
   printf("server closed..\n");

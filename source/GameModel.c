@@ -1,6 +1,6 @@
 #include "GameModel.h"
 #include "GameView.h"
-#include <stdlib.h> // För rand() och srand()
+#include <stdlib.h> // För rand() och sra(
 #include <time.h>   // För time()
 
 #define WINDOW_WIDTH 1200
@@ -34,8 +34,8 @@ void initializeModel(GameModel *model)
     model->alive = true;
     for (int i = 0; i < 30; i++)
     { // Förbereder alla möjliga block
-        model->environment.blockPositions[i].x = 1200 + i * 50;
-        model->environment.blockPositions[i].y = rand() % 750;
+        model->environment.blockPositions[i].x = 1200 + 15 * 50;
+        model->environment.blockPositions[i].y = model->environment.next30Rand[i];;
         model->environment.blockPositions[i].w = 50;
         model->environment.blockPositions[i].h = 50;
     }
@@ -79,8 +79,10 @@ void updateBlocks(GameModel *model, SDL_Rect shipRect)
         model->environment.blockPositions[i].x -= model->environment.blockSpeed;
         if (model->environment.blockPositions[i].x < -model->environment.blockPositions[i].w)
         {
-            model->environment.blockPositions[i].x = 1200;
-            model->environment.blockPositions[i].y = rand() % (750 - model->environment.blockPositions[i].h);
+            //model->environment.blockPositions[i].y = rand() % (750 - model->environment.blockPositions[i].h);
+            model->environment.blockPositions[i].y = model->environment.next30Rand[i];
+            model->environment.blockPositions[i].x = 1200 + 77*( model->environment.blockPositions[i].y % 5);
+            //
         }
     }
 }

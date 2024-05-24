@@ -24,6 +24,7 @@ typedef struct PlayerPos
 typedef struct udpDataToClient{
   Player player;
   int clientId;
+  int next30Rand[30];
   int status; //idk what this is
   bool gameReady;
     } udpDataToClient;

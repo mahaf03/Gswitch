@@ -42,6 +42,7 @@ typedef struct {
     int activeBlocks;
     int numRocks;
     int lastRockIncreaseTime;
+    int next30Rand[30];
 } Environment;
 
 typedef struct {

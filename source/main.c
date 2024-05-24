@@ -152,8 +152,6 @@ int main(int argv, char **args)
 
             if (currentState == Game)
             {
-
-                gameView(&renderer, &window, &texture, &texture1, &bgTexture, &blockTexture);
                 handleEvent(&event, &model.player[0], &closeWindow);
             }
         }
@@ -170,6 +168,8 @@ int main(int argv, char **args)
             if (gameReady)
             {
                 currentState = Game;
+                gameView(&renderer, &window, &texture, &texture1, &bgTexture, &blockTexture);
+                model.gameState.startTime = SDL_GetTicks();
             }
         }
 
@@ -242,7 +242,9 @@ int main(int argv, char **args)
             printf("new message from %x:\n", addrr.host);
             printf("\tx:\t%f\n\ty:\t%f\n}", message.player.x, message.player.y);
             model.player[0].playerID = message.clientId; // assign this clients playerID
+            //memcpy(&model.environment,&message.environment,sizeof(Environment));
             gameReady = message.gameReady;
+            memcpy(&model.environment.next30Rand ,&message.next30Rand,sizeof(int)*30);
             for (int i = 0; i < 4; i++)
             {
                 if (message.player.playerID == model.player[0].playerID)
