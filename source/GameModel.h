@@ -25,6 +25,23 @@ typedef enum {
     ASTRONAUT1
 } PlayerImage;
 
+typedef enum {
+    PRIORITY_HIGH,
+    PRIORITY_LOW,
+    PRIORITY_MEDIUM,
+} MessagePriority;
+
+typedef struct {
+    MessagePriority priority;
+    void* message;     // Peka till meddelandet, anpassa typen efter behov
+    size_t messageSize;
+} PriorityMessage;
+
+typedef struct {
+    int playerId;      // ID för spelaren som dött
+    int gameState;     // Nuvärande tillstånd i spelet, exempelvis om spelet är över
+} CriticalUpdate;
+
 typedef struct {
     float x, y;  // Player's position
     float velocityX, velocityY;  // Player's velocity
@@ -72,5 +89,7 @@ void handleCollision(Player *player, SDL_Rect shipRect, SDL_Rect *blockPositions
 void updateBlocks(GameModel* model, SDL_Rect shipRect);
 void updateGameState(GameModel* model);
 void updateCharacterPosition(GameModel* model);
+void enqueueMessage(MessagePriority priority, const void* message, size_t size);
+void handlePlayerDeath(int playerId, CriticalUpdate criticalUpdate);
 
 #endif

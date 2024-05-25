@@ -8,6 +8,11 @@
 #define SHIP_WIDTH 50
 #define SHIP_HEIGHT 50
 
+PriorityMessage queue[100];
+int queueSize = 0;
+
+
+
 void initializeModel(GameModel *model)
 {
     srand((unsigned int)time(NULL));
@@ -133,6 +138,10 @@ void handleCollision(Player *player, SDL_Rect shipRect, SDL_Rect *blockPositions
                         printf("Player %d died\n", player->playerID);
                         model->playercount--;
                         player->isDead = true;
+                        void handlePlayerDeath(int playerId, CriticalUpdate criticalUpdate);
+                        // Exempel på att lägga till ett kritiskt meddelande i kön
+                        
+
                         // model->alive = false;
                         //*gameState = YouDied;
                         //exit(0);
@@ -235,6 +244,35 @@ void updateCharacterPosition(GameModel *model)
         else if (model->player[i].y > WINDOW_HEIGHT - SHIP_HEIGHT - SHIP_HEIGHT - SHIP_HEIGHT / 2.f)
         {
             model->player[i].y = WINDOW_HEIGHT - SHIP_HEIGHT - SHIP_HEIGHT - SHIP_HEIGHT / 2.f;
+        }
+    }
+}
+
+void handlePlayerDeath(int playerId, CriticalUpdate criticalUpdate) {
+    // Ange att spelaren har dött
+    criticalUpdate.playerId = playerId;
+    criticalUpdate.gameState = waitingForGameToEnd;  // Antag att detta är en konstant som representerar spelets tillstånd
+    // Prioritera och skicka meddelandet
+    enqueueMessage(PRIORITY_HIGH, &criticalUpdate, sizeof(CriticalUpdate));
+}
+
+void enqueueMessage(MessagePriority priority, const void* message, size_t size) {
+    if (queueSize < 100) {
+        queue[queueSize].priority = priority;
+        queue[queueSize].message = malloc(size);
+        memcpy(queue[queueSize].message, message, size);
+        queue[queueSize].messageSize = size;
+        queueSize++;
+        // Sortera kön baserat på prioritet, högsta prioritet först
+        // Detta är en mycket enkel sortering för demonstration, överväg att använda effektivare algoritmer
+        for (int i = 0; i < queueSize; i++) {
+            for (int j = i + 1; j < queueSize; j++) {
+                if (queue[j].priority < queue[i].priority) {
+                    PriorityMessage temp = queue[i];
+                    queue[i] = queue[j];
+                    queue[j] = temp;
+                }
+            }
         }
     }
 }
