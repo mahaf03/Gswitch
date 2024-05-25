@@ -16,7 +16,7 @@ SDL_Texture *renderText(const char *message, const char *fontFile, SDL_Color col
 void getInputIP(char *ipBuffer, int bufferSize, SDL_Renderer *renderer, GameWindowState *currentState, SDL_Texture *backgroundTexture);
 void renderWaitForPlayers(SDL_Renderer **renderer, SDL_Window **window, SDL_Texture **backgroundTexture);
 void gameView(SDL_Renderer **renderer, SDL_Window **window, SDL_Texture **texture, SDL_Texture **texture1, SDL_Texture **backgroundTexture, SDL_Texture **blockTexture);
-void renderView(SDL_Renderer *renderer, SDL_Texture *texture, SDL_Texture *texture1, SDL_Texture *backgroundTexture, SDL_Texture *blockTexture, GameModel *model, SDL_Rect shipRect, SDL_Texture *YouDiedTexture);
+void renderView(SDL_Renderer *renderer, SDL_Texture *texture, SDL_Texture *texture1, SDL_Texture *backgroundTexture, SDL_Texture *blockTexture, GameModel *model, SDL_Rect shipRect);
 void closeView(SDL_Renderer *renderer, SDL_Window *window, SDL_Texture *shipTexture, SDL_Texture *backgroundTexture, SDL_Texture *blockTexture);
 void loadBackground(SDL_Renderer *renderer, SDL_Texture **backgroundTexture);
 void loadYouDiedTexture(SDL_Renderer *renderer, SDL_Texture **youDiedTexture);
@@ -25,5 +25,5 @@ void placeTile(SDL_Renderer *renderer, SDL_Texture *texture, int x, int y);
 void drawLives(SDL_Renderer *renderer, int lives, int x, int y, int playerID);
 void drawExtraLife(SDL_Renderer *renderer, int x, int y);
 void renderWinnerMenu(SDL_Renderer *renderer, int winnerId);
-
+void renderWaitingForGameToEnd(SDL_Renderer *renderer);
 #endif

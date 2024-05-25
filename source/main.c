@@ -203,7 +203,7 @@ int main(int argv, char **args)
                 prePosX = model.player[0].x;
                 prePosY = model.player[0].y;
             }
-            renderView(renderer, texture, texture1, bgTexture, blockTexture, &model, shipRect, youDiedTexture);
+            renderView(renderer, texture, texture1, bgTexture, blockTexture, &model, shipRect);
         }
 
         frameTime = SDL_GetTicks() - frameStart; // Hur länge det tog att processa ramen
@@ -253,17 +253,6 @@ int main(int argv, char **args)
             }
         }
 
-        if (aliveCount > 1 && model.player[0].isDead == true)
-        {
-            currentState = waitingForGameToEnd;
-            printf("Current state: waitingForGameToEnd\n");
-        }
-        else if (aliveCount == 1)
-        {
-            winnerId = lastAlivePlayerId;
-            currentState = winnerMenu;
-            printf("Current state: winnerMenu\n");
-        }
 
         if (currentState == waitingForGameToEnd)
         {
@@ -274,6 +263,17 @@ int main(int argv, char **args)
                 printf("shabäbs ja bytte");
             }
             
+        }
+        if (aliveCount > 1 && model.player[0].isDead == true)
+        {
+            currentState = waitingForGameToEnd;
+            printf("Current state: waitingForGameToEnd\n");
+        }
+        else if (aliveCount == 1)
+        {
+            winnerId = lastAlivePlayerId;
+            currentState = winnerMenu;
+            printf("Current state: winnerMenu\n");
         }
 
         if (currentState == winnerMenu)

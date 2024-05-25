@@ -229,6 +229,50 @@ void drawLives(SDL_Renderer *renderer, int lives, int x, int y, int playerID)
     }
 }
 
+void renderWaitingForGameToEnd(SDL_Renderer *renderer)
+{
+    // Initiera TTF om det inte redan är initierat
+    if (TTF_WasInit() == 0 && TTF_Init() == -1)
+    {
+        printf("TTF_Init: %s\n", TTF_GetError());
+        return;
+    }
+
+    // Ställ in svart bakgrund
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); // Svart färg
+    SDL_RenderClear(renderer);
+
+    // Ladda fonten (se till att ange korrekt sökväg till din fontfil)
+    TTF_Font *font = TTF_OpenFont("resources/lato-italic.ttf", 28);
+    if (font == NULL)
+    {
+        printf("Failed to load font: %s\n", TTF_GetError());
+        return;
+    }
+
+    // Skapa textytan
+    SDL_Color color = {255, 255, 255, 255}; // Vit färg
+    SDL_Surface *textSurface = TTF_RenderText_Solid(font, "Waiting for the game to end", color);
+    if (textSurface == NULL)
+    {
+        printf("Failed to create text surface: %s\n", TTF_GetError());
+        TTF_CloseFont(font);
+        return;
+    }
+
+    // Skapa texturen från ytan
+    SDL_Texture *textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
+    SDL_Rect textRect = {1200 / 2 - textSurface->w / 2, 686 / 2 - textSurface->h / 2, textSurface->w, textSurface->h};
+    SDL_RenderCopy(renderer, textTexture, NULL, &textRect);
+
+    // Frigör ytan och texturen
+    SDL_FreeSurface(textSurface);
+    SDL_DestroyTexture(textTexture);
+    TTF_CloseFont(font);
+
+    // Uppdatera skärmen
+    SDL_RenderPresent(renderer);
+}
 
 void loadBackground(SDL_Renderer *renderer, SDL_Texture **backgroundTexture)
 {
@@ -255,7 +299,7 @@ void loadBlock(SDL_Renderer *renderer, SDL_Texture **blockTexture)
     *blockTexture = SDL_CreateTextureFromSurface(renderer, surface);
     SDL_FreeSurface(surface);
 }
-void renderView(SDL_Renderer *renderer, SDL_Texture *texture, SDL_Texture *texture1, SDL_Texture *backgroundTexture, SDL_Texture *blockTexture, GameModel *model, SDL_Rect shipRect, SDL_Texture *YouDiedTexture)
+void renderView(SDL_Renderer *renderer, SDL_Texture *texture, SDL_Texture *texture1, SDL_Texture *backgroundTexture, SDL_Texture *blockTexture, GameModel *model, SDL_Rect shipRect)
 {
     SDL_RenderClear(renderer);
 
@@ -264,11 +308,6 @@ void renderView(SDL_Renderer *renderer, SDL_Texture *texture, SDL_Texture *textu
     if (backgroundTexture)
     {
         SDL_RenderCopy(renderer, backgroundTexture, NULL, NULL);
-    }
-
-    if (YouDiedTexture)
-    {
-        SDL_RenderCopy(renderer, YouDiedTexture, NULL, NULL);
     }
 
     SDL_Rect shipRectPlayers[4];
