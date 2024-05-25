@@ -12,7 +12,6 @@
 
 int main(int argv, char **args)
 {
-
     SDL_Init(SDL_INIT_VIDEO);
     SDL_Window *window = NULL;
     SDL_Renderer *renderer = NULL;
@@ -27,6 +26,7 @@ int main(int argv, char **args)
     SDL_Texture *muteVolume = NULL;
 
     GameModel model;
+    Player player;
     window = SDL_CreateWindow("GSwitch", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1200, 686, 0);
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
     bool gameReady = false;
@@ -66,7 +66,7 @@ int main(int argv, char **args)
     const int frameDelay = 1000 / FPS; // Tiden varje frame bör ta
     Uint32 frameStart;
     int frameTime;
-    int playercount = 0;
+
     // Du måste också passera en pekare till bakgrundstexturen till initView
     // initView(&renderer, &window, &texture, &bgTexture);
     printf("initializing network... \n");
@@ -83,6 +83,10 @@ int main(int argv, char **args)
 
     float prePosX = model.player[0].x;
     float prePosY = model.player[0].y;
+
+    bool gameWon = false;
+    int winnerId = 0; // Initialisera till 0 eller något giltigt spelvärde
+
     while (!closeWindow)
     {
         frameStart = SDL_GetTicks();
@@ -135,7 +139,6 @@ int main(int argv, char **args)
                         closeWindow = true;
                     }
                 }
-              
             }
 
             if (currentState == Ip)
@@ -173,37 +176,9 @@ int main(int argv, char **args)
             }
         }
 
-        else if (!model.alive)
-        {
-            printf("Player is dead\n");
-
-            // Visa "You Died"-skärmen permanent
-            loadYouDiedTexture(renderer, &youDiedTexture);
-            renderYouDied(&renderer, &window, &youDiedTexture);
-
-            // Fortsätt rendera "You Died"-skärmen tills användaren stänger fönstret
-            while (!closeWindow)
-            {
-                while (SDL_PollEvent(&event))
-                {
-                    if (event.type == SDL_QUIT)
-                    {
-                        closeWindow = true;
-                    }
-                }
-                SDL_RenderClear(renderer);
-                // renderYouDied(&renderer, &window, &youDiedTexture);
-                SDL_Delay(100); // Liten fördröjning för att undvika hög CPU-användning
-            }
-        }
-
         else if (currentState == Game)
         {
             // Uppdatera och rendera spelet
-            // SDL_DestroyTexture(continueTexture);
-            // SDL_DestroyTexture(exitTexture);
-
-            // Move players
             for (int i = 0; i < 4; i++)
             {
                 SDL_Rect shipRect = {(int)model.player[i].x, (int)model.player[i].y, 50, 50};
@@ -227,24 +202,21 @@ int main(int argv, char **args)
 
                 prePosX = model.player[0].x;
                 prePosY = model.player[0].y;
-                // printf("sent data to server \n\tx: %f\n\ty: %f\n",prePosX,prePosY);
             }
-            // if move, then send to server.
             renderView(renderer, texture, texture1, bgTexture, blockTexture, &model, shipRect, youDiedTexture);
         }
 
         frameTime = SDL_GetTicks() - frameStart; // Hur länge det tog att processa ramen
         udpDataToClient message;
         IPaddress addrr = clientReceivePacket(&message, &sd);
-        // clientReceivePacket(&message, &sd);
+
         if (addrr.host != 0 && addrr.port != 0) // har vi tagit emot något??
         {
             printf("new message from %x:\n", addrr.host);
-            printf("\tx:\t%f\n\ty:\t%f\n}", message.player.x, message.player.y);
+            printf("\tx:\t%f\n\ty:\t%f\n\tlife:%d\n}", message.player.x, message.player.y, message.player.playerLife);
             model.player[0].playerID = message.clientId; // assign this clients playerID
-            //memcpy(&model.environment,&message.environment,sizeof(Environment));
             gameReady = message.gameReady;
-            memcpy(&model.environment.next30Rand ,&message.next30Rand,sizeof(int)*30);
+            memcpy(&model.environment.next30Rand, &message.next30Rand, sizeof(int) * 30);
             for (int i = 0; i < 4; i++)
             {
                 if (message.player.playerID == model.player[0].playerID)
@@ -263,23 +235,59 @@ int main(int argv, char **args)
                     model.player[i].x = message.player.x;
                     model.player[i].y = message.player.y;
                     model.player[i].playerLife = message.player.playerLife;
+                    model.player[i].isDead = message.player.isDead;
                     break;
                 }
             }
         }
-        int alive= 0;
-        int playerwon = -1;
-        for (int i = 0; i<4; i++)
-            {
-                if (model.player[i].playerLife>0)
-                    {alive++;}
-                else{playerwon = i;}
-            }
 
-        if (alive ==1)
+        // Kontrollera vinnare och spelets tillstånd
+        int aliveCount = 0;
+        int lastAlivePlayerId = -1;
+        for (int i = 0; i < 4; i++)
+        {
+            if (!model.player[i].isDead)
             {
-                printf("player %d has won!!\n\n",playerwon);
+                aliveCount++;
+                lastAlivePlayerId = model.player[i].playerID;
             }
+        }
+
+        if (aliveCount > 1 && model.player[0].isDead == true)
+        {
+            currentState = waitingForGameToEnd;
+            printf("Current state: waitingForGameToEnd\n");
+        }
+        else if (aliveCount == 1)
+        {
+            winnerId = lastAlivePlayerId;
+            currentState = winnerMenu;
+            printf("Current state: winnerMenu\n");
+        }
+
+        if (currentState == waitingForGameToEnd)
+        {
+            printf("Waiting for the game to end\n");
+            if (aliveCount == 1)
+            {
+                currentState = winnerMenu;
+                printf("shabäbs ja bytte");
+            }
+            
+        }
+
+        if (currentState == winnerMenu)
+        {
+            renderWinnerMenu(renderer, winnerId);
+            while (SDL_PollEvent(&event))
+            {
+                if (event.type == SDL_QUIT)
+                {
+                    closeWindow = true;
+                }
+            }
+        }
+
         if (frameDelay > frameTime)
         {
             SDL_Delay(frameDelay - frameTime);

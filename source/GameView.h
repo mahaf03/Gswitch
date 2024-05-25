@@ -24,5 +24,6 @@ void loadBlock(SDL_Renderer *renderer, SDL_Texture **blockTexture);
 void placeTile(SDL_Renderer *renderer, SDL_Texture *texture, int x, int y);
 void drawLives(SDL_Renderer *renderer, int lives, int x, int y);
 void drawExtraLife(SDL_Renderer *renderer, int x, int y);
+void renderWinnerMenu(SDL_Renderer *renderer, int winnerId);
 
 #endif

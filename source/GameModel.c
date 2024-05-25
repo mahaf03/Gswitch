@@ -130,8 +130,10 @@ void handleCollision(Player *player, SDL_Rect shipRect, SDL_Rect *blockPositions
                     player->playerLife--; // Decrease life
                     if (player->playerLife == 0)
                     {
-                        printf("Game Over\n");
-                        model->alive = false;
+                        printf("Player %d died\n", player->playerID);
+                        model->playercount--;
+                        player->isDead = true;
+                        // model->alive = false;
                         //*gameState = YouDied;
                         //exit(0);
 

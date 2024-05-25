@@ -282,6 +282,50 @@ void placeTile(SDL_Renderer *renderer, SDL_Texture *texture, int x, int y)
     SDL_RenderCopy(renderer, texture, NULL, &tileRect);
 }
 
+void renderWinnerMenu(SDL_Renderer *renderer, int winnerId) {
+    // Initiera TTF om det inte redan är initierat
+    if (TTF_WasInit() == 0 && TTF_Init() == -1) {
+        printf("TTF_Init: %s\n", TTF_GetError());
+        return;
+    }
+
+    // Ladda fonten (se till att ange korrekt sökväg till din fontfil)
+    TTF_Font *font = TTF_OpenFont("resources/lato-italic.ttf", 28);
+    if (font == NULL) {
+        printf("Failed to load font: %s\n", TTF_GetError());
+        return;
+    }
+
+    // Rendera bakgrunden
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); // Svart bakgrund
+    SDL_RenderClear(renderer);
+
+    // Skapa textytan
+    SDL_Color color = {255, 255, 255, 255}; // Vit färg
+    char winnerText[50];
+    snprintf(winnerText, sizeof(winnerText), "Player %d won!", winnerId + 1);
+    SDL_Surface *textSurface = TTF_RenderText_Solid(font, winnerText, color);
+    if (textSurface == NULL) {
+        printf("Failed to create text surface: %s\n", TTF_GetError());
+        TTF_CloseFont(font);
+        return;
+    }
+
+    // Skapa texturen från ytan
+    SDL_Texture *textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
+    SDL_Rect textRect = {1200 / 2 - textSurface->w / 2, 686 / 2 - textSurface->h / 2, textSurface->w, textSurface->h};
+    SDL_RenderCopy(renderer, textTexture, NULL, &textRect);
+
+    // Frigör ytan och texturen
+    SDL_FreeSurface(textSurface);
+    SDL_DestroyTexture(textTexture);
+    TTF_CloseFont(font);
+
+    // Uppdatera skärmen
+    SDL_RenderPresent(renderer);
+}
+
+
 // void drawExtraLife(SDL_Renderer* renderer, int x, int y) {
 //     int barWidth = 15;
 //     SDL_Color color = {255, 0, 0};

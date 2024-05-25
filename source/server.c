@@ -4,6 +4,7 @@
 #include <stdbool.h>
 #include "SDL2/SDL_net.h"
 #include "Network.h"
+#include "GameModel.h"
 // #define MAX_PLAYERS 4;
 
 int main(int argc, char **argv)
@@ -15,10 +16,11 @@ int main(int argc, char **argv)
   Uint32 startCount;
   printf("opening server..\n");
   udpDataToClient dataSend = {};
-  int playercount = 0;
   dataSend.status = 0;
   IPaddress players[4];
   int next30Rand[30];
+  GameModel gameModel;
+  gameModel.playercount = 0;
   for (int i=0;i<30;i++)
     {
       next30Rand[i] = rand() % 700;
@@ -46,8 +48,8 @@ int main(int argc, char **argv)
         if (players[i].host == 0 && players[i].port == 0)
         {
           // the message is from a not already connected player
-          playercount++;
-          if (playercount == 2)
+          gameModel.playercount++;
+          if (gameModel.playercount == 4)
           {
             dataSend.gameReady = true;
             printf("Fyra spelare anslutna, spelet startar!\n");
@@ -58,17 +60,6 @@ int main(int argc, char **argv)
           players[i] = host;
           playerNo = i;
           break;
-
-          // if (playercount == 4)
-          // {
-          //   fourPlayers = true;
-          // }
-          // // här ökar vi antalet spelare
-          // // hur gör vi så att spelet börjar när vi har 4 spelare?
-          // printf("Player %d connected! \n \t %x \n \t %d\n", i + 1, host.host, host.port);
-          // players[i] = host;
-          // playerNo = i;
-          // break;
         }
         else if (host.host == players[i].host && host.port == players[i].port)
         {
@@ -91,7 +82,7 @@ int main(int argc, char **argv)
         dataSend.player = message.player;
         memcpy(&dataSend.next30Rand ,&next30Rand,sizeof(int)*30);
         // resend the message to all other connected clients
-        for (int i = 0; i < playercount; i++)
+        for (int i = 0; i < gameModel.playercount; i++)
         {
           printf("\t%d\t", i);
           printf("\thost: %d player[i].host: %d\n", host.host, players[i].host);

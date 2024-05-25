@@ -15,6 +15,8 @@ typedef enum
     MusicOff,
     YouDied,
     waitForPlayers, 
+    waitingForGameToEnd,
+    winnerMenu,
 } GameWindowState;
 
 
@@ -33,6 +35,7 @@ typedef struct {
     bool isImmortal;
     Uint32 immortalStartTime;
     int playerID;
+    bool isDead;
     PlayerImage currentPlayerImage;
 } Player;
 
@@ -58,6 +61,7 @@ typedef struct {
     Environment environment;
     GameState gameState;
     bool alive;
+    int playercount;
 } GameModel;
 
 void initializeModel(GameModel* model);
