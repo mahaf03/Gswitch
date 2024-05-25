@@ -262,7 +262,7 @@ int main(int argv, char **args)
         if (aliveCount == 0 && gameWon)
         {
             currentState = winnerMenu;
-            printf("Alla spelare är döda. Vinnare: Player %d\n", winnerId);
+            printf("Alla spelare är döda. Vinnare: Player %d\n", winnerId + 1);
         }
 
         if (currentState == winnerMenu)
