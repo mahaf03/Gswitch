@@ -253,27 +253,16 @@ int main(int argv, char **args)
             }
         }
 
-        if (aliveCount > 1 && model.player[0].isDead == true)
-        {
-            currentState = waitingForGameToEnd;
-            printf("Current state: waitingForGameToEnd\n");
-        }
-        else if (aliveCount == 1)
+        if (aliveCount == 1 && !gameWon)
         {
             winnerId = lastAlivePlayerId;
-            currentState = winnerMenu;
-            printf("Current state: winnerMenu\n");
+            gameWon = true;
         }
 
-        if (currentState == waitingForGameToEnd)
+        if (aliveCount == 0 && gameWon)
         {
-            printf("Waiting for the game to end\n");
-            if (aliveCount == 1)
-            {
-                currentState = winnerMenu;
-                printf("shabäbs ja bytte");
-            }
-            
+            currentState = winnerMenu;
+            printf("Alla spelare är döda. Vinnare: Player %d\n", winnerId);
         }
 
         if (currentState == winnerMenu)
