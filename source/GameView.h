@@ -22,7 +22,7 @@ void loadBackground(SDL_Renderer *renderer, SDL_Texture **backgroundTexture);
 void loadYouDiedTexture(SDL_Renderer *renderer, SDL_Texture **youDiedTexture);
 void loadBlock(SDL_Renderer *renderer, SDL_Texture **blockTexture);
 void placeTile(SDL_Renderer *renderer, SDL_Texture *texture, int x, int y);
-void drawLives(SDL_Renderer *renderer, int lives, int x, int y);
+void drawLives(SDL_Renderer *renderer, int lives, int x, int y, int playerID);
 void drawExtraLife(SDL_Renderer *renderer, int x, int y);
 void renderWinnerMenu(SDL_Renderer *renderer, int winnerId);
 

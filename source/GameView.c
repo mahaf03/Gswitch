@@ -28,6 +28,7 @@ SDL_Texture *renderText(const char *message, const char *fontFile, SDL_Color col
     {
         printf("SDL_CreateTextureFromSurface: %s\n", SDL_GetError());
     }
+    // lägg player id bredvid liven
 
     SDL_FreeSurface(surf);
     TTF_CloseFont(font);
@@ -191,17 +192,44 @@ void gameView(SDL_Renderer **renderer, SDL_Window **window, SDL_Texture **textur
     // loadYouDiedTexture(renderer, youDiedTexture);
     loadBlock(*renderer, blockTexture);
 }
-void drawLives(SDL_Renderer *renderer, int lives, int x, int y)
+
+void drawLives(SDL_Renderer *renderer, int lives, int x, int y, int playerID)
 {
     int barWidth = 15;
+    int offset = 40; // För att flytta ner texten och livsindikatorerna
     SDL_Color color = {0, 255, 255}; // blå färg för livsindikatorn
+    SDL_Color textColor = {255, 255, 255, 255}; // vit färg för texten
+
+    // Rendera spelarens ID som text
+    TTF_Font *font = TTF_OpenFont("resources/lato-italic.ttf", 24);
+    if (!font)
+    {
+        printf("TTF_OpenFont: %s\n", TTF_GetError());
+        return;
+    }
+
+    char playerIDText[20];
+    snprintf(playerIDText, sizeof(playerIDText), "Player %d", playerID + 1);
+    SDL_Surface *textSurface = TTF_RenderText_Solid(font, playerIDText, textColor);
+    SDL_Texture *textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
+
+    SDL_Rect textRect = {x, y + offset - 30, textSurface->w, textSurface->h}; // Placera texten ovanför livsindikatorerna
+    SDL_RenderCopy(renderer, textTexture, NULL, &textRect);
+
+    SDL_FreeSurface(textSurface);
+    SDL_DestroyTexture(textTexture);
+    TTF_CloseFont(font);
+
+    // Rendera livsindikatorerna
     for (int i = 0; i < lives; i++)
     {
-        SDL_Rect rect = {x + i * (barWidth + 5), y, barWidth, 20};
+        SDL_Rect rect = {x + i * (barWidth + 5), y + offset, barWidth, 20};
         SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, 255);
         SDL_RenderFillRect(renderer, &rect);
     }
 }
+
+
 void loadBackground(SDL_Renderer *renderer, SDL_Texture **backgroundTexture)
 {
     SDL_Surface *surface = IMG_Load("resources/background.png");
@@ -258,7 +286,8 @@ void renderView(SDL_Renderer *renderer, SDL_Texture *texture, SDL_Texture *textu
         placeTile(renderer, blockTexture, model->environment.blockPositions[i].x, model->environment.blockPositions[i].y);
     }
 
-    drawLives(renderer, model->player[0].playerLife, 10, 10); // Visa rektanglar som liv nedanför texten
+
+        drawLives(renderer, model->player[0].playerLife, 10, 10, model->player[0].playerID); // Visa rektanglar som liv nedanför texten
 
     if (model->gameState.lifeActive)
     {

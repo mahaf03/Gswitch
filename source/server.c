@@ -80,6 +80,10 @@ int main(int argc, char **argv)
         }
 
         dataSend.player = message.player;
+        if (message.player.isDead)
+        {
+          gameModel.playercount--; //testa senare
+        }
         memcpy(&dataSend.next30Rand ,&next30Rand,sizeof(int)*30);
         // resend the message to all other connected clients
         for (int i = 0; i < gameModel.playercount; i++)
