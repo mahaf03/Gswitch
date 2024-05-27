@@ -36,8 +36,6 @@ int main(int argv, char **args)
     SDL_Rect volumeButtonRect = {450, 450, 300, 100};
     SDL_Rect MuteButtonRect = {500, 430, 150, 150}; // Positionerad under "Continue" knappen med 50 pixels mellanrum
 
-    initializeModel(&model);
-
     bool success = true;
     if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0)
     {
@@ -78,6 +76,7 @@ int main(int argv, char **args)
     printf("Network initialized!\n");
     // Allocate memory for UDP packets
     bool closeWindow = false;
+    initializeModel(&model);
     GameWindowState currentMusicState = MusicOn;
     GameWindowState currentState = Ip;
 
@@ -86,7 +85,7 @@ int main(int argv, char **args)
 
     bool gameWon = false;
     int winnerId = 0; // Initialisera till 0 eller något giltigt spelvärde
-
+    Uint32 winnerMenuStartTime = 0;
     while (!closeWindow)
     {
         frameStart = SDL_GetTicks();
@@ -134,9 +133,13 @@ int main(int argv, char **args)
                 }
                 else if (currentState == Ip)
                 {
-                    if (event.type == SDL_QUIT)
+                    
+                    while (SDL_PollEvent(&event))
                     {
-                        closeWindow = true;
+                        if (event.type == SDL_QUIT)
+                        {
+                            closeWindow = true;
+                        }
                     }
                 }
             }
@@ -150,6 +153,14 @@ int main(int argv, char **args)
                 {
                     fprintf(stderr, "SDLNet_ResolveHost(%s 49156): %s\n", ipAddress, SDLNet_GetError());
                     exit(EXIT_FAILURE);
+                }
+
+                while (SDL_PollEvent(&event))
+                {
+                    if (event.type == SDL_QUIT)
+                    {
+                        closeWindow = true;
+                    }
                 }
             }
 
@@ -166,6 +177,7 @@ int main(int argv, char **args)
         else if (currentState == waitForPlayers)
         {
             // Rendera vänta på spelare-skärmen
+            //initializeModel(&model);
             renderWaitForPlayers(&renderer, &window, &bgTexture);
             // Kolla om vi har fått tillräckligt med spelare
             if (gameReady)
@@ -257,6 +269,7 @@ int main(int argv, char **args)
         {
             winnerId = lastAlivePlayerId;
             gameWon = true;
+            winnerMenuStartTime = SDL_GetTicks();
         }
 
         if (aliveCount == 0 && gameWon)
@@ -268,6 +281,14 @@ int main(int argv, char **args)
         if (currentState == winnerMenu)
         {
             renderWinnerMenu(renderer, winnerId);
+            if (SDL_GetTicks() - winnerMenuStartTime >= 10000)
+            { // Kontrollera om 5 sekunder har passerat
+                gameWon = false;
+                currentState = Ip; // Byt tillstånd till huvudmenyn eller något annat lämpligt tillstånd
+
+            } // Återställ vinnarflaggan'
+            // När en specifik händelse inträffar, skicka återställningsförfrågan
+
             while (SDL_PollEvent(&event))
             {
                 if (event.type == SDL_QUIT)
