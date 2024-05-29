@@ -7,8 +7,6 @@
 #include "GameModel.h"
 #define MAX_PLAYERS 4
 
-
-
 // void resetGameServer(UDPsocket *sd, IPaddress *players, GameModel *gameModel, int *next30Rand)
 // {
 //   // Stänga eventuella öppna nätverkssessioner och återöppna dem
@@ -55,6 +53,7 @@ int main(int argc, char **argv)
   udpDataToClient dataSend = {};
   dataSend.status = 0;
   IPaddress players[4];
+  bool playerDead[4];
   int next30Rand[30];
   GameModel gameModel;
   gameModel.playercount = 0;
@@ -67,7 +66,9 @@ int main(int argc, char **argv)
   {
     IPaddress empty = {0, 0};
     players[i] = empty;
+    playerDead[i] = false;
   }
+
   initNetwork_Server(&sd);
   udpDataToServer message;
   int quit = 0;
@@ -88,7 +89,6 @@ int main(int argc, char **argv)
       {
         if (players[i].host == 0 && players[i].port == 0)
         {
-          // the message is from a not already connected player
           gameModel.playercount++;
           if (gameModel.playercount == 4)
           {
@@ -105,6 +105,7 @@ int main(int argc, char **argv)
         {
           // the message is from already connected player
           playerNo = i;
+          playerDead[i] = message.player.isDead;
           break;
         }
       }
@@ -120,10 +121,11 @@ int main(int argc, char **argv)
         }
 
         dataSend.player = message.player;
-        if (message.player.isDead)
-        {
-          gameModel.playercount--; // testa senare
-        }
+
+        // if (message.player.isDead)
+        // {
+        //   gameModel.playercount--; // testa senare
+        // }
         memcpy(&dataSend.next30Rand, &next30Rand, sizeof(int) * 30);
         // resend the message to all other connected clients
         for (int i = 0; i < gameModel.playercount; i++)
@@ -131,13 +133,36 @@ int main(int argc, char **argv)
           printf("\t%d\t", i);
           printf("\thost: %d player[i].host: %d\n", host.host, players[i].host);
 
-          // resend the packet to al players.
           if (players[i].host != 0)
           {
             dataSend.clientId = i;
             serverSendPacket(dataSend, &players[i], &sd);
             printf("sent data to player\n");
           }
+        }
+
+        int deadCount = 0;
+        for (int i = 0; i < gameModel.playercount; i++)
+        {
+          if (playerDead[i] == true)
+          {
+            deadCount++;
+          }
+        }
+        printf("deadcount %d ", deadCount);
+
+        if (deadCount == gameModel.playercount)
+        {
+          for (int i = 0; i < gameModel.playercount; i++)
+          {
+            playerDead[i] = false;
+            players[i].host = 0;
+            players[i].port = 0;
+          }
+
+          gameModel.playercount = 0;
+          dataSend.gameReady = false;
+          printf("Vi nollställer \n");
         }
       }
     }

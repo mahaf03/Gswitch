@@ -76,7 +76,7 @@ int main(int argv, char **args)
     printf("Network initialized!\n");
     // Allocate memory for UDP packets
     bool closeWindow = false;
-    initializeModel(&model);
+    // initializeModel(&model);
     GameWindowState currentMusicState = MusicOn;
     GameWindowState currentState = Ip;
 
@@ -133,7 +133,7 @@ int main(int argv, char **args)
                 }
                 else if (currentState == Ip)
                 {
-                    
+
                     while (SDL_PollEvent(&event))
                     {
                         if (event.type == SDL_QUIT)
@@ -172,12 +172,13 @@ int main(int argv, char **args)
         if (currentState == Menu)
         {
             // Rendera menyn
+            initializeModel(&model);
             renderMenu(&renderer, &window, &bgTexture, &continueTexture, &exitTexture, continueButtonRect, exitButtonRect, volumeButtonRect, &volumeTexture);
         }
         else if (currentState == waitForPlayers)
         {
             // Rendera vänta på spelare-skärmen
-            //initializeModel(&model);
+            // initializeModel(&model);
             renderWaitForPlayers(&renderer, &window, &bgTexture);
             // Kolla om vi har fått tillräckligt med spelare
             if (gameReady)
@@ -284,6 +285,7 @@ int main(int argv, char **args)
             if (SDL_GetTicks() - winnerMenuStartTime >= 10000)
             { // Kontrollera om 5 sekunder har passerat
                 gameWon = false;
+                gameReady = false;
                 currentState = Ip; // Byt tillstånd till huvudmenyn eller något annat lämpligt tillstånd
 
             } // Återställ vinnarflaggan'
